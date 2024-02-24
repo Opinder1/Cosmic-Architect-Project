@@ -7,7 +7,7 @@ var accelerator: float = 1
 var enabled: float = false
 
 
-func _input(event):
+func _input(event : InputEvent) -> void:
 	if event is InputEventKey:
 		if event.keycode == KEY_X and event.is_released():
 			enabled = !enabled
@@ -18,7 +18,7 @@ func _input(event):
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
-func movement_fps(delta: float):
+func movement_fps(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector("forward", "backward", "left", "right").rotated(rotation.y)
 	
 	var vertical: float = Input.get_axis("down", "up")
@@ -31,7 +31,7 @@ func movement_fps(delta: float):
 	rotation_degrees.x = clamp(rotation_degrees.x, -90, 90)
 
 
-func movement_space(delta: float):
+func movement_space(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector("left", "right", "forward", "backward")
 	
 	var vertical: float = Input.get_axis("down", "up")
@@ -52,7 +52,7 @@ func movement_space(delta: float):
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float):
+func _process(delta: float) -> void:
 	if not enabled:
 		return
 	

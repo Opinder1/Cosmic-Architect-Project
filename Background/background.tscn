@@ -1,11 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://qng8qkhsfknm"]
+[gd_scene load_steps=11 format=3 uid="uid://qng8qkhsfknm"]
 
 [ext_resource type="Script" path="res://Background/Stars/Stars.gd" id="1_03nuf"]
 [ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Background/Stars/stars.tres" id="2_383oo"]
 [ext_resource type="Script" path="res://Background/Galaxies/Galaxies.gd" id="3_8nuhy"]
 [ext_resource type="Script" path="res://Background/DebugCamera.gd" id="4_vbghr"]
-
-[sub_resource type="World3D" id="World3D_tgwit"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_binky"]
 
@@ -25,7 +23,7 @@ transform_format = 1
 mesh = SubResource("PlaneMesh_ovc6y")
 
 [sub_resource type="Environment" id="Environment_h16ae"]
-background_mode = 2
+background_mode = 1
 glow_enabled = true
 glow_levels/1 = 1.0
 glow_levels/2 = 1.0
@@ -36,37 +34,23 @@ glow_intensity = 2.0
 glow_bloom = 1.0
 glow_blend_mode = 1
 
-[node name="Background" type="SubViewportContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-stretch = true
+[node name="Background" type="Node"]
 
-[node name="SubViewport" type="SubViewport" parent="."]
-own_world_3d = true
-world_3d = SubResource("World3D_tgwit")
-handle_input_locally = false
-size = Vector2i(1152, 648)
-render_target_update_mode = 4
-
-[node name="DebugCamera" type="Camera3D" parent="SubViewport"]
+[node name="DebugCamera" type="Camera3D" parent="."]
 script = ExtResource("4_vbghr")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
 
-[node name="Stars" type="MeshInstance3D" parent="SubViewport"]
+[node name="Stars" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_binky")
-skeleton = NodePath("../../../..")
+skeleton = NodePath("../..")
 script = ExtResource("1_03nuf")
 material = SubResource("ShaderMaterial_qbocf")
 
-[node name="Galaxies" type="MultiMeshInstance3D" parent="SubViewport"]
-visible = false
+[node name="Galaxies" type="MultiMeshInstance3D" parent="."]
 multimesh = SubResource("MultiMesh_p36j4")
 script = ExtResource("3_8nuhy")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_h16ae")

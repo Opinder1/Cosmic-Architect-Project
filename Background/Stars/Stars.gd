@@ -5,7 +5,7 @@ class_name Stars
 
 @export var material: Material
 
-func generate_star(vertexes, colors, i):
+func generate_star(vertexes : PackedVector3Array, colors : PackedColorArray, i : int) -> void:
 	var x: float = randfn(0, 800)
 	var z: float = randfn(0, 800)
 	var y: float = randfn(0, clamp(100 - (Vector2(x, z).length() / 32), 0, 32))
@@ -14,7 +14,7 @@ func generate_star(vertexes, colors, i):
 	
 	colors[i] = Color.from_hsv(randf_range(0, 1), randf_range(0, 0.5), 1) # Color can be anything though limit saturation to 50% to keep whiteness
 
-func generate_stars_mesh(stars_mesh: Mesh):
+func generate_stars_mesh(stars_mesh: Mesh) -> void:
 	# Make the mesh array
 	var stars_mesh_surface: Array
 	stars_mesh_surface.resize(Mesh.ARRAY_MAX)
@@ -36,7 +36,7 @@ func generate_stars_mesh(stars_mesh: Mesh):
 	stars_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, stars_mesh_surface, [], {}, Mesh.ARRAY_FORMAT_VERTEX | Mesh.ARRAY_FORMAT_COLOR)
 	
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	generate_stars_mesh(mesh)
 	
 	mesh.surface_set_material(0, material)

@@ -2,9 +2,9 @@
 
 [node name="Options" type="TabContainer"]
 visible = false
+current_tab = 0
 
 [node name="Display" type="Panel" parent="."]
-visible = false
 layout_mode = 2
 
 [node name="Video" type="Panel" parent="."]
@@ -18,9 +18,9 @@ layout_mode = 2
 [node name="Controls" type="TabContainer" parent="."]
 visible = false
 layout_mode = 2
+current_tab = 0
 
 [node name="Keyboard" type="Panel" parent="Controls"]
-visible = false
 layout_mode = 2
 
 [node name="Mouse" type="Panel" parent="Controls"]

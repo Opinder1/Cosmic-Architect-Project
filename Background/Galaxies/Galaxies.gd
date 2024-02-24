@@ -1,6 +1,6 @@
 extends MultiMeshInstance3D
 
-func generate_galaxies():
+func generate_galaxies() -> void:
 	multimesh.instance_count = 10000
 	
 	for i in range(10000):
@@ -14,5 +14,5 @@ func generate_galaxies():
 		multimesh.set_instance_transform(i, transform)
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	generate_galaxies()
