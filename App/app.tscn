@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://cxw86dgqbbixr"]
+
+[ext_resource type="PackedScene" uid="uid://biick080ufbfu" path="res://MainMenu/main_menu.tscn" id="2_jb6t3"]
+[ext_resource type="PackedScene" uid="uid://cv6su5gwcxe5j" path="res://Game/game_instance.tscn" id="2_q5gnp"]
+[ext_resource type="PackedScene" uid="uid://qng8qkhsfknm" path="res://Background/background.tscn" id="3_h2nnp"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
+
+[sub_resource type="Environment" id="Environment_obw4t"]
+background_mode = 3
+
+[node name="App" type="Node"]
+
+[node name="LoadingScreen" type="Node" parent="."]
+
+[node name="MainMenu" parent="." instance=ExtResource("2_jb6t3")]
+
+[node name="MenuScene" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="MenuScene"]
+transform = Transform3D(0.42499, 0, 0.905198, 0, 1, 0, -0.905198, 0, 0.42499, 4.45518, 0.54556, 2.68366)
+current = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MenuScene"]
+mesh = SubResource("BoxMesh_tl06j")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MenuScene"]
+transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734184, 0.708983, -0.447452, 0.545096, 0, 0, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="MenuScene"]
+environment = SubResource("Environment_obw4t")
+
+[node name="GameInstance" parent="." instance=ExtResource("2_q5gnp")]
+stretch = true
+
+[node name="Background" parent="." instance=ExtResource("3_h2nnp")]

@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3 uid="uid://biick080ufbfu"]
+
+[ext_resource type="Script" path="res://MainMenu/menu_switch.gd" id="1_dk1bm"]
+[ext_resource type="Script" path="res://MainMenu/main_menu.gd" id="1_tqig5"]
+[ext_resource type="PackedScene" uid="uid://d1ktylv4w4u1e" path="res://MainMenu/Title/title.tscn" id="3_s7ewx"]
+[ext_resource type="PackedScene" uid="uid://f2f4irfpxuoo" path="res://MainMenu/Tabs/tabs.tscn" id="4_d2alh"]
+
+[node name="MainMenu" type="Node"]
+script = ExtResource("1_tqig5")
+
+[node name="MenuSwitch" type="CanvasLayer" parent="."]
+script = ExtResource("1_dk1bm")
+
+[node name="Title" parent="MenuSwitch" instance=ExtResource("3_s7ewx")]
+
+[node name="GameList" parent="MenuSwitch" instance=ExtResource("4_d2alh")]
+
+[node name="Load" type="Panel" parent="MenuSwitch"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Controls" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Back" type="Button" parent="Controls"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -45.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Back"
+
+[node name="ControlHints" type="CanvasLayer" parent="."]
+layer = 3

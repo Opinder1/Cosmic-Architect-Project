@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://y7sh33bbmhnq"]
+
+[ext_resource type="Script" path="res://MainMenu/Singleplayer/singleplayer.gd" id="1_a0dbl"]
+
+[node name="Singleplayer" type="VBoxContainer"]
+script = ExtResource("1_a0dbl")
+
+[node name="GameListContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="GameList" type="VBoxContainer" parent="GameListContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="GameCommands" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="Play" type="Button" parent="GameCommands"]
+layout_mode = 2
+text = "Play"
+
+[node name="Delete" type="Button" parent="GameCommands"]
+layout_mode = 2
+text = "Delete"
+
+[node name="Rename" type="Button" parent="GameCommands"]
+layout_mode = 2
+text = "Rename"
+
+[node name="CreateNew" type="Button" parent="GameCommands"]
+layout_mode = 2
+text = "Create new"
