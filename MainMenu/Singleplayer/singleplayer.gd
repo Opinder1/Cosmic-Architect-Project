@@ -4,11 +4,11 @@ extends Control
 
 @export var button_group = ButtonGroup.new()
 
-@export var save_directory : String = "user://Universe"
+@export var save_directory: String = "user://Universe"
 
 var directory : DirAccess
 
-signal selected_save(save_directory)
+signal selected_save(save_directory: String)
 
 func _connect_signals() -> void:
 	visibility_changed.connect(_on_visiblity_change)
@@ -35,6 +35,9 @@ func create() -> void:
 func refresh() -> void:
 	directory = DirAccess.open(save_directory)
 	
+	for child in game_list.get_children():
+		game_list.remove_child(child)
+	
 	for game_dir in directory.get_directories_at(save_directory):
 		var game = GalaxyEntry.new()
 		
@@ -50,7 +53,7 @@ func refresh() -> void:
 
 func _on_press_play() -> void:
 	if (button_group.get_pressed_button()):
-		var galaxy_dir = button_group.get_pressed_button().galaxy_dir
+		var galaxy_dir: String = button_group.get_pressed_button().galaxy_dir
 		
 		print("play: ", button_group.get_pressed_button().galaxy_dir)
 		
@@ -66,3 +69,6 @@ func _on_press_rename() -> void:
 
 func _on_press_createnew() -> void:
 	print("createnew")
+	
+	directory.make_dir(var_to_str(randi_range(1111111,9999999)))
+	refresh()

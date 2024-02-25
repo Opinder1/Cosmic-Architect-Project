@@ -1,5 +1,4 @@
-class_name Screen
-extends CanvasLayer
+class_name Screen extends CanvasLayer
 
 var screen_stack : Node
 
