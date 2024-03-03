@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cxw86dgqbbixr"]
+[gd_scene load_steps=13 format=3 uid="uid://cxw86dgqbbixr"]
 
 [ext_resource type="Script" path="res://NodeTypes/screen_stack.gd" id="1_s33dr"]
 [ext_resource type="Script" path="res://App/app.gd" id="1_ucuhh"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cv6su5gwcxe5j" path="res://Game/game_instance.tscn" id="2_q5gnp"]
 [ext_resource type="PackedScene" uid="uid://dv57ptvvfodsp" path="res://MainMenu/load_overlay.tscn" id="5_t7fn4"]
 [ext_resource type="Script" path="res://NodeTypes/screen.gd" id="6_a40to"]
+[ext_resource type="PackedScene" uid="uid://qng8qkhsfknm" path="res://Background/background.tscn" id="8_cgnyj"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
 
@@ -14,6 +15,8 @@
 background_mode = 3
 
 [sub_resource type="World3D" id="World3D_dm67y"]
+
+[sub_resource type="World3D" id="World3D_8cvj5"]
 
 [node name="App" type="Node"]
 script = ExtResource("1_ucuhh")
@@ -78,9 +81,30 @@ stretch = true
 [node name="GameInstanceViewport" type="SubViewport" parent="ScreenStack/InGame/GameInstanceContainer"]
 own_world_3d = true
 world_3d = SubResource("World3D_dm67y")
+transparent_bg = true
 handle_input_locally = false
 msaa_3d = 3
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
 
 [node name="GameInstance" parent="ScreenStack/InGame/GameInstanceContainer/GameInstanceViewport" instance=ExtResource("2_q5gnp")]
+
+[node name="InGameBackground" type="CanvasLayer" parent="ScreenStack"]
+
+[node name="BackgroundContainer" type="SubViewportContainer" parent="ScreenStack/InGameBackground"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="BackgroundViewport" type="SubViewport" parent="ScreenStack/InGameBackground/BackgroundContainer"]
+own_world_3d = true
+world_3d = SubResource("World3D_8cvj5")
+handle_input_locally = false
+msaa_3d = 3
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="Background" parent="ScreenStack/InGameBackground/BackgroundContainer/BackgroundViewport" instance=ExtResource("8_cgnyj")]

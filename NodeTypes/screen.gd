@@ -13,6 +13,9 @@ func _notification(what: int) -> void:
 func set_screen(screen_name: String) -> void:
 	screen_stack.set_screen(screen_name)
 
+func set_screens(screen_names: PackedStringArray) -> void:
+	screen_stack.set_screens(screen_names)
+
 func overlay_screen(screen_name: String) -> void:
 	screen_stack.overlay_screen(screen_name)
 

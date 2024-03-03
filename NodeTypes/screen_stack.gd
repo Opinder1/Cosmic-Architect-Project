@@ -1,5 +1,5 @@
 class_name ScreenStack extends Node
-		
+
 func _update_screens() -> void:
 	var screen_count: int = get_child_count()
 	
