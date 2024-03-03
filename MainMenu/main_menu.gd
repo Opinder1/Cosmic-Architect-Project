@@ -10,4 +10,4 @@ func _ready() -> void:
 func _on_select_save(save_directory : String) -> void:
 	print("selected save: ", save_directory)
 	
-	set_screens(["InGame", "InGameBackground"])
+	set_screens(["Game"])

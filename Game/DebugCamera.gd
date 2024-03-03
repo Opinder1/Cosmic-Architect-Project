@@ -1,11 +1,9 @@
-extends Camera3D
-class_name TestCamera
+class_name TestCamera extends Camera3D
 
 @export var speed: float = 1
 @export var space_movement: bool = true
 var accelerator: float = 1
 var enabled: float = false
-
 
 func _input(event : InputEvent) -> void:
 	if event is InputEventKey:
@@ -48,7 +46,8 @@ func movement_space(delta: float) -> void:
 	else:
 		accelerator /= 1 + delta
 		
-	accelerator = clamp(accelerator, 1, 10000)
+	#accelerator = clamp(accelerator, 1, 100000)
+	accelerator = max(accelerator, 1)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

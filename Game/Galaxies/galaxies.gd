@@ -5,7 +5,7 @@ func generate_galaxies() -> void:
 	
 	for i in range(10000):
 		var rotation = Vector3(randf_range(0, TAU), randf_range(0, TAU), randf_range(0, TAU))
-		var position = Vector3(randfn(0, 800), randfn(0, 800), randfn(0, 800))
+		var position = Vector3(randfn(0, 8000), randfn(0, 8000), randfn(0, 8000))
 		
 		var transform: Transform3D
 		transform.basis = Basis.from_euler(rotation, EULER_ORDER_XYZ)

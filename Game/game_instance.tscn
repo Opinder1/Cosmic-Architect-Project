@@ -1,20 +1,133 @@
-[gd_scene load_steps=3 format=3 uid="uid://cv6su5gwcxe5j"]
+[gd_scene load_steps=18 format=3 uid="uid://b81ud1acmkygt"]
+
+[ext_resource type="Script" path="res://Game/Stars/Stars.gd" id="1_cw5sh"]
+[ext_resource type="Script" path="res://Game/game_instance.gd" id="1_q16sb"]
+[ext_resource type="Script" path="res://Game/DebugCamera.gd" id="1_wcy3j"]
+[ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Game/Stars/stars.tres" id="2_pbqvp"]
+[ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Game/Galaxies/galaxies.tres" id="4_wtbaq"]
+
+[sub_resource type="World3D" id="World3D_eflx2"]
+
+[sub_resource type="Environment" id="Environment_h16ae"]
+background_mode = 1
+glow_enabled = true
+glow_levels/1 = 1.0
+glow_levels/2 = 1.0
+glow_levels/4 = 1.0
+glow_levels/6 = 1.0
+glow_levels/7 = 1.0
+glow_intensity = 2.0
+glow_bloom = 1.0
+glow_blend_mode = 1
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_binky"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qbocf"]
+render_priority = 0
+shader = ExtResource("2_pbqvp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_21l4j"]
+render_priority = 0
+shader = ExtResource("4_wtbaq")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ovc6y"]
+material = SubResource("ShaderMaterial_21l4j")
+
+[sub_resource type="MultiMesh" id="MultiMesh_kmfr0"]
+transform_format = 1
+mesh = SubResource("PlaneMesh_ovc6y")
+
+[sub_resource type="GDScript" id="GDScript_7vwvm"]
+script/source = "extends MultiMeshInstance3D
+
+func generate_galaxies() -> void:
+	multimesh.instance_count = 10000
+	
+	for i in range(10000):
+		var rotation = Vector3(randf_range(0, TAU), randf_range(0, TAU), randf_range(0, TAU))
+		var position = Vector3(randfn(0, 800), randfn(0, 800), randfn(0, 800))
+		
+		var transform: Transform3D
+		transform.basis = Basis.from_euler(rotation, EULER_ORDER_XYZ)
+		transform.origin = position
+		
+		multimesh.set_instance_transform(i, transform)
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	generate_galaxies()
+"
+
+[sub_resource type="World3D" id="World3D_dm67y"]
+
+[sub_resource type="Environment" id="Environment_6ioqx"]
+background_mode = 1
+background_color = Color(0, 0, 0, 0)
+
+[sub_resource type="World" id="World_l40j6"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_yvhtg"]
 
-[sub_resource type="Environment" id="Environment_6ioqx"]
-background_color = Color(0, 0, 0, 0)
+[node name="GameInstance" type="SubViewportContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+script = ExtResource("1_q16sb")
 
-[node name="GameInstance" type="Node"]
+[node name="StarsLayer" type="SubViewport" parent="."]
+own_world_3d = true
+world_3d = SubResource("World3D_eflx2")
+handle_input_locally = false
+msaa_3d = 3
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
 
-[node name="WorldNode" type="WorldNode" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="StarsLayer"]
+environment = SubResource("Environment_h16ae")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Camera" type="Camera3D" parent="StarsLayer"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="StarsLayer"]
+transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
+
+[node name="Stars" type="MeshInstance3D" parent="StarsLayer"]
+mesh = SubResource("ArrayMesh_binky")
+script = ExtResource("1_cw5sh")
+material = SubResource("ShaderMaterial_qbocf")
+
+[node name="Galaxies" type="MultiMeshInstance3D" parent="StarsLayer"]
+multimesh = SubResource("MultiMesh_kmfr0")
+script = SubResource("GDScript_7vwvm")
+
+[node name="GameLayer" type="SubViewport" parent="."]
+own_world_3d = true
+world_3d = SubResource("World3D_dm67y")
+transparent_bg = true
+handle_input_locally = false
+msaa_3d = 3
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="GameLayer"]
+environment = SubResource("Environment_6ioqx")
+
+[node name="Camera" type="Camera3D" parent="GameLayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
+script = ExtResource("1_wcy3j")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="GameLayer"]
+transform = Transform3D(0.101434, 0.993072, -0.0593291, 0.322986, 0.0235332, 0.946111, 0.940952, -0.11513, -0.318361, 0, 0, 0)
+
+[node name="WorldNode" type="WorldNode" parent="GameLayer"]
+world = SubResource("World_l40j6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="GameLayer"]
 mesh = SubResource("CapsuleMesh_yvhtg")
 skeleton = NodePath("")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_6ioqx")
+[node name="Speed" type="Button" parent="GameLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
