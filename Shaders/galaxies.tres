@@ -21,7 +21,6 @@ void vertex() {
 
 }
 "
-graph_offset = Vector2(-486.47, -20.41)
 nodes/vertex/2/node = SubResource("VisualShaderNodeInput_j0oeb")
 nodes/vertex/2/position = Vector2(-180, 300)
 nodes/vertex/connections = PackedInt32Array(2, 0, 0, 6)

@@ -51,7 +51,7 @@ func movement_space(delta: float) -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func do_camera_controls(delta: float) -> void:
 	if not enabled:
 		return
 	

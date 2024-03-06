@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://d1ktylv4w4u1e"]
+[gd_scene load_steps=2 format=3 uid="uid://migf3ve8vyn2"]
 
-[ext_resource type="Script" path="res://Title/title.gd" id="1_f82jx"]
+[ext_resource type="Script" path="res://App/title.gd" id="1_mef4q"]
 
 [node name="Title" type="CanvasLayer"]
-script = ExtResource("1_f82jx")
+script = ExtResource("1_mef4q")
 
 [node name="Options" type="VBoxContainer" parent="."]
 anchors_preset = 13

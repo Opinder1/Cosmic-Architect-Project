@@ -1,10 +1,10 @@
 [gd_scene load_steps=18 format=3 uid="uid://b81ud1acmkygt"]
 
-[ext_resource type="Script" path="res://Game/Stars/Stars.gd" id="1_cw5sh"]
-[ext_resource type="Script" path="res://Game/game_instance.gd" id="1_q16sb"]
-[ext_resource type="Script" path="res://Game/DebugCamera.gd" id="1_wcy3j"]
-[ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Game/Stars/stars.tres" id="2_pbqvp"]
-[ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Game/Galaxies/galaxies.tres" id="4_wtbaq"]
+[ext_resource type="Script" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
+[ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1_q16sb"]
+[ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="1_wcy3j"]
+[ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Shaders/stars.tres" id="3_qhnjt"]
+[ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Shaders/galaxies.tres" id="4_qjjyv"]
 
 [sub_resource type="World3D" id="World3D_eflx2"]
 
@@ -16,19 +16,21 @@ glow_levels/2 = 1.0
 glow_levels/4 = 1.0
 glow_levels/6 = 1.0
 glow_levels/7 = 1.0
-glow_intensity = 2.0
+glow_intensity = 4.6
+glow_strength = 1.5
+glow_mix = 0.1
 glow_bloom = 1.0
-glow_blend_mode = 1
+glow_blend_mode = 4
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_binky"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qbocf"]
 render_priority = 0
-shader = ExtResource("2_pbqvp")
+shader = ExtResource("3_qhnjt")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_21l4j"]
 render_priority = 0
-shader = ExtResource("4_wtbaq")
+shader = ExtResource("4_qjjyv")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ovc6y"]
 material = SubResource("ShaderMaterial_21l4j")

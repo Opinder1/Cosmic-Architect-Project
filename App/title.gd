@@ -1,8 +1,4 @@
-extends Screen
-
-signal singleplayer_pressed
-signal multiplayer_pressed
-signal options_pressed
+class_name Title extends Screen
 
 func _connect_signals() -> void:
 	$Options/Singleplayer.pressed.connect(_on_singleplayer_pressed)
@@ -10,17 +6,18 @@ func _connect_signals() -> void:
 	$Options/Options.pressed.connect(_on_options_pressed)
 	$Options/Exit.pressed.connect(_on_exit_pressed)
 
+# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_connect_signals()
 
 func _on_singleplayer_pressed() -> void:
-	set_screen("MainMenu")
+	push_screens(["MainMenu", "Controls"], {"tab": "singleplayer"})
 
 func _on_multiplayer_pressed() -> void:
-	pass
+	push_screens(["MainMenu", "Controls"], {"tab": "multiplayer"})
 
 func _on_options_pressed() -> void:
-	pass
+	push_screens(["MainMenu", "Controls"], {"tab": "options"})
 
 func _on_exit_pressed() -> void:
-	get_tree().quit()
+	pop_screens()

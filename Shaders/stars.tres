@@ -20,7 +20,7 @@ operator = 3
 input_name = "color"
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_2qp8p"]
-default_input_values = [0, 10.0, 1, 0.0]
+default_input_values = [0, 50.0, 1, 0.0]
 operator = 3
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_jopy6"]
@@ -33,18 +33,20 @@ input_name = "modelview_matrix"
 
 [sub_resource type="VisualShaderNodeTransformVecMult" id="VisualShaderNodeTransformVecMult_am2dq"]
 
-[sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_5evd5"]
-
 [sub_resource type="VisualShaderNodeVaryingSetter" id="VisualShaderNodeVaryingSetter_l4n21"]
 varying_name = "Bright"
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_q385r"]
-default_input_values = [0, 50.0, 1, 0.2]
+default_input_values = [0, 50.0, 1, 0.1]
 operator = 1
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_vynay"]
+default_input_values = [0, 0.0, 1, 0.1]
+operator = 6
 
 [resource]
 code = "shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx, shadows_disabled, ambient_light_disabled;
+render_mode blend_add, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx, shadows_disabled, ambient_light_disabled, vertex_lighting;
 
 
 // Varyings
@@ -75,7 +77,7 @@ void vertex() {
 
 
 // FloatOp:21
-	float n_in21p0 = 10.00000;
+	float n_in21p0 = 50.00000;
 	float n_out21p0 = n_in21p0 / n_out25p0;
 
 
@@ -96,18 +98,17 @@ void vertex() {
 
 
 // FloatOp:30
-	float n_in30p1 = 0.20000;
+	float n_in30p1 = 0.10000;
 	float n_out30p0 = n_out19p0 - n_in30p1;
 
 
-// Clamp:28
-	float n_in28p1 = 0.00000;
-	float n_in28p2 = 1.00000;
-	float n_out28p0 = clamp(n_out30p0, n_in28p1, n_in28p2);
+// FloatOp:31
+	float n_in31p1 = 0.10000;
+	float n_out31p0 = max(n_out30p0, n_in31p1);
 
 
 // VaryingSetter:29
-	Bright = n_out28p0;
+	Bright = n_out31p0;
 
 
 }
@@ -136,9 +137,10 @@ void light() {
 
 }
 "
-graph_offset = Vector2(-424.861, -22.0477)
+modes/blend = 1
 flags/shadows_disabled = true
 flags/ambient_light_disabled = true
+flags/vertex_lighting = true
 varyings/Bright = "0,0"
 nodes/vertex/0/position = Vector2(800, 160)
 nodes/vertex/11/node = SubResource("VisualShaderNodeInput_kl5v5")
@@ -157,13 +159,13 @@ nodes/vertex/25/node = SubResource("VisualShaderNodeVectorLen_547rh")
 nodes/vertex/25/position = Vector2(0, 340)
 nodes/vertex/26/node = SubResource("VisualShaderNodeTransformVecMult_am2dq")
 nodes/vertex/26/position = Vector2(-300, 340)
-nodes/vertex/28/node = SubResource("VisualShaderNodeClamp_5evd5")
-nodes/vertex/28/position = Vector2(900, 500)
 nodes/vertex/29/node = SubResource("VisualShaderNodeVaryingSetter_l4n21")
-nodes/vertex/29/position = Vector2(1120, 520)
+nodes/vertex/29/position = Vector2(1020, 500)
 nodes/vertex/30/node = SubResource("VisualShaderNodeFloatOp_q385r")
-nodes/vertex/30/position = Vector2(720, 480)
-nodes/vertex/connections = PackedInt32Array(20, 0, 0, 6, 21, 0, 0, 7, 22, 0, 19, 1, 19, 0, 0, 9, 25, 0, 21, 1, 25, 0, 22, 0, 23, 0, 26, 0, 11, 0, 26, 1, 26, 0, 25, 0, 30, 0, 28, 0, 19, 0, 30, 0, 28, 0, 29, 0)
+nodes/vertex/30/position = Vector2(660, 480)
+nodes/vertex/31/node = SubResource("VisualShaderNodeFloatOp_vynay")
+nodes/vertex/31/position = Vector2(840, 480)
+nodes/vertex/connections = PackedInt32Array(22, 0, 19, 1, 19, 0, 0, 9, 25, 0, 21, 1, 25, 0, 22, 0, 23, 0, 26, 0, 11, 0, 26, 1, 26, 0, 25, 0, 19, 0, 30, 0, 30, 0, 31, 0, 31, 0, 29, 0, 21, 0, 0, 7, 20, 0, 0, 6)
 nodes/fragment/0/position = Vector2(1320, 400)
 nodes/fragment/9/node = SubResource("VisualShaderNodeInput_1rc0r")
 nodes/fragment/9/position = Vector2(960, 400)
