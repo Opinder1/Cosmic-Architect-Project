@@ -1,9 +1,33 @@
-[gd_scene load_steps=2 format=3 uid="uid://migf3ve8vyn2"]
+[gd_scene load_steps=2 format=3 uid="uid://db6ivxsxuo17x"]
 
-[ext_resource type="Script" path="res://App/title.gd" id="1_mef4q"]
+[sub_resource type="GDScript" id="GDScript_sqnn6"]
+script/source = "class_name Title extends Screen
+
+func _connect_signals() -> void:
+	$Options/Singleplayer.pressed.connect(_on_singleplayer_pressed)
+	$Options/Multiplayer.pressed.connect(_on_multiplayer_pressed)
+	$Options/Options.pressed.connect(_on_options_pressed)
+	$Options/Exit.pressed.connect(_on_exit_pressed)
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	_connect_signals()
+
+func _on_singleplayer_pressed() -> void:
+	push_screens([\"MainMenu\", \"Controls\"], {\"tab\": \"singleplayer\"})
+
+func _on_multiplayer_pressed() -> void:
+	push_screens([\"MainMenu\", \"Controls\"], {\"tab\": \"multiplayer\"})
+
+func _on_options_pressed() -> void:
+	push_screens([\"MainMenu\", \"Controls\"], {\"tab\": \"options\"})
+
+func _on_exit_pressed() -> void:
+	pop_screens()
+"
 
 [node name="Title" type="CanvasLayer"]
-script = ExtResource("1_mef4q")
+script = SubResource("GDScript_sqnn6")
 
 [node name="Options" type="VBoxContainer" parent="."]
 anchors_preset = 13

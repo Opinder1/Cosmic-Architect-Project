@@ -1,52 +1,58 @@
-[gd_scene load_steps=11 format=3 uid="uid://cxw86dgqbbixr"]
+[gd_scene load_steps=7 format=3 uid="uid://cxw86dgqbbixr"]
 
 [ext_resource type="Script" path="res://App/app.gd" id="1_ucuhh"]
-[ext_resource type="Script" path="res://NodeTypes/screen_stack.gd" id="2_f5m60"]
-[ext_resource type="PackedScene" uid="uid://i5i7brlf54ks" path="res://App/MainMenu/main_menu.tscn" id="2_jb6t3"]
-[ext_resource type="PackedScene" uid="uid://dv57ptvvfodsp" path="res://App/MainMenu/load_overlay.tscn" id="5_t7fn4"]
+[ext_resource type="PackedScene" uid="uid://d1vk18h1dvun1" path="res://App/MainMenu/main_menu.tscn" id="2_jb6t3"]
+[ext_resource type="PackedScene" uid="uid://b81ud1acmkygt" path="res://App/Game/game_instance.tscn" id="4_6abbc"]
 [ext_resource type="Script" path="res://NodeTypes/screen.gd" id="6_a40to"]
-[ext_resource type="PackedScene" uid="uid://migf3ve8vyn2" path="res://App/title.tscn" id="7_2ks24"]
-[ext_resource type="PackedScene" uid="uid://cdbx1x8l6of0o" path="res://App/Game/game.tscn" id="7_6e83u"]
-[ext_resource type="PackedScene" uid="uid://dsv63cr31tkyh" path="res://controls.tscn" id="8_fiut6"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
 
 [sub_resource type="Environment" id="Environment_obw4t"]
 background_mode = 3
 
-[node name="App" type="Node"]
+[node name="App" type="Container"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_ucuhh")
 
-[node name="ScreenStack" type="Node" parent="."]
-script = ExtResource("2_f5m60")
-
-[node name="Game" parent="ScreenStack" instance=ExtResource("7_6e83u")]
-
-[node name="MenuScene" type="CanvasLayer" parent="ScreenStack"]
+[node name="Game" type="Container" parent="."]
+layout_mode = 2
 script = ExtResource("6_a40to")
 
-[node name="Camera3D" type="Camera3D" parent="ScreenStack/MenuScene"]
+[node name="GameInstance" parent="Game" instance=ExtResource("4_6abbc")]
+layout_mode = 2
+
+[node name="MenuScene" type="Container" parent="."]
+layout_mode = 2
+script = ExtResource("6_a40to")
+
+[node name="Camera3D" type="Camera3D" parent="MenuScene"]
 transform = Transform3D(0.42499, 0, 0.905198, 0, 1, 0, -0.905198, 0, 0.42499, 4.45518, 0.54556, 2.68366)
 current = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="ScreenStack/MenuScene"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MenuScene"]
 mesh = SubResource("BoxMesh_tl06j")
 skeleton = NodePath("")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="ScreenStack/MenuScene"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MenuScene"]
 transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="ScreenStack/MenuScene"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="MenuScene"]
 environment = SubResource("Environment_obw4t")
 
-[node name="LoadOverlay" parent="ScreenStack" instance=ExtResource("5_t7fn4")]
+[node name="MainMenu" parent="." instance=ExtResource("2_jb6t3")]
+layout_mode = 2
 
-[node name="MainMenu" parent="ScreenStack" instance=ExtResource("2_jb6t3")]
-
-[node name="Title" parent="ScreenStack" instance=ExtResource("7_2ks24")]
-
-[node name="ControlHints" type="CanvasLayer" parent="ScreenStack"]
-layer = 3
+[node name="LoadOverlay" type="Container" parent="."]
+layout_mode = 2
 script = ExtResource("6_a40to")
 
-[node name="Controls" parent="ScreenStack" instance=ExtResource("8_fiut6")]
+[node name="Image" type="Panel" parent="LoadOverlay"]
+layout_mode = 2
+
+[node name="ControlHints" type="Container" parent="."]
+layout_mode = 2
+script = ExtResource("6_a40to")
