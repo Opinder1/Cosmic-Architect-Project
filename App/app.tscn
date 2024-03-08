@@ -8,9 +8,9 @@
 [sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
 
 [sub_resource type="Environment" id="Environment_obw4t"]
-background_mode = 3
 
-[node name="App" type="Container"]
+[node name="App" type="Control"]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -18,15 +18,26 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ucuhh")
 
-[node name="Game" type="Container" parent="."]
-layout_mode = 2
+[node name="Game" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("6_a40to")
 
 [node name="GameInstance" parent="Game" instance=ExtResource("4_6abbc")]
 layout_mode = 2
+anchors_preset = 0
 
-[node name="MenuScene" type="Container" parent="."]
-layout_mode = 2
+[node name="MenuScene" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("6_a40to")
 
 [node name="Camera3D" type="Camera3D" parent="MenuScene"]
@@ -44,15 +55,30 @@ transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.73
 environment = SubResource("Environment_obw4t")
 
 [node name="MainMenu" parent="." instance=ExtResource("2_jb6t3")]
-layout_mode = 2
+layout_mode = 1
 
-[node name="LoadOverlay" type="Container" parent="."]
-layout_mode = 2
+[node name="LoadOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("6_a40to")
 
 [node name="Image" type="Panel" parent="LoadOverlay"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ControlHints" type="Container" parent="."]
-layout_mode = 2
+[node name="ControlHints" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("6_a40to")

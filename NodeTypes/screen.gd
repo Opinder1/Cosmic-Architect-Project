@@ -1,1 +1,1 @@
-class_name Screen extends Container
+class_name Screen extends Control

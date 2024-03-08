@@ -53,11 +53,11 @@ func refresh() -> void:
 
 func _on_press_play() -> void:
 	if (button_group.get_pressed_button()):
-		var galaxy_dir: String = button_group.get_pressed_button().galaxy_dir
+		var galaxy_directory: String = button_group.get_pressed_button().galaxy_dir
 		
 		print("play: ", button_group.get_pressed_button().galaxy_dir)
 		
-		selected_save.emit(galaxy_dir)
+		selected_save.emit(galaxy_directory)
 
 func _on_press_delete() -> void:
 	if (button_group.get_pressed_button()):

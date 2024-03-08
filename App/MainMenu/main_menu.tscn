@@ -1,34 +1,40 @@
 [gd_scene load_steps=5 format=3 uid="uid://d1vk18h1dvun1"]
 
-[ext_resource type="Script" path="res://App/MainMenu/MainMenu.gd" id="1_qr4l1"]
+[ext_resource type="Script" path="res://App/MainMenu/main_menu.gd" id="1_qr4l1"]
 [ext_resource type="PackedScene" uid="uid://y7sh33bbmhnq" path="res://App/MainMenu/Singleplayer/singleplayer.tscn" id="4_jx5af"]
 [ext_resource type="Script" path="res://NodeTypes/screen.gd" id="4_s2ocw"]
 [ext_resource type="PackedScene" uid="uid://clekyrsrihh1w" path="res://App/MainMenu/Options/options.tscn" id="5_rqk1x"]
 
-[node name="MainMenu" type="Container"]
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_qr4l1")
 
-[node name="Tabs" type="TabContainer" parent="."]
+[node name="Title" type="Control" parent="."]
 layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Singleplayer" parent="Tabs" instance=ExtResource("4_jx5af")]
-layout_mode = 2
-
-[node name="Multiplayer" type="Panel" parent="Tabs"]
-visible = false
-layout_mode = 2
-
-[node name="Options" parent="Tabs" instance=ExtResource("5_rqk1x")]
-layout_mode = 2
-
-[node name="Title" type="Container" parent="."]
-layout_mode = 2
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("4_s2ocw")
 
 [node name="Options" type="VBoxContainer" parent="Title"]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
+metadata/_edit_use_anchors_ = true
 
 [node name="Singleplayer" type="Button" parent="Title/Options"]
 layout_mode = 2
@@ -46,10 +52,54 @@ text = "Options"
 layout_mode = 2
 text = "Exit"
 
-[node name="Controls" type="Container" parent="."]
+[node name="Menus" type="Control" parent="."]
 layout_mode = 2
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("4_s2ocw")
 
-[node name="Back" type="Button" parent="Controls"]
+[node name="Tabs" type="TabContainer" parent="Menus"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="Singleplayer" parent="Menus/Tabs" instance=ExtResource("4_jx5af")]
 layout_mode = 2
+
+[node name="Multiplayer" type="Panel" parent="Menus/Tabs"]
+visible = false
+layout_mode = 2
+
+[node name="Options" parent="Menus/Tabs" instance=ExtResource("5_rqk1x")]
+layout_mode = 2
+
+[node name="Controls" type="Control" parent="Menus"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_s2ocw")
+metadata/_edit_use_anchors_ = true
+
+[node name="Back" type="Button" parent="Menus/Controls"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -45.0
+offset_top = -31.0
+grow_horizontal = 0
+grow_vertical = 0
 text = "Back"
