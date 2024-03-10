@@ -15,7 +15,6 @@ func _input(event : InputEvent) -> void:
 			else:
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
-
 func movement_fps(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector("forward", "backward", "left", "right").rotated(rotation.y)
 	
@@ -27,7 +26,6 @@ func movement_fps(delta: float) -> void:
 	rotation.y -= Input.get_last_mouse_velocity().x * delta * 0.001
 	
 	rotation_degrees.x = clamp(rotation_degrees.x, -90, 90)
-
 
 func movement_space(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector("left", "right", "forward", "backward")
@@ -48,7 +46,6 @@ func movement_space(delta: float) -> void:
 		
 	#accelerator = clamp(accelerator, 1, 100000)
 	accelerator = max(accelerator, 1)
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func do_camera_controls(delta: float) -> void:

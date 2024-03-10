@@ -4,6 +4,8 @@ func _connect_signals() -> void:
 	$MainMenu.game_selected.connect(_on_game_selected)
 	
 func _on_game_selected(save_directory: String, multiplayer: bool) -> void:
+	set_screen($LoadOverlay)
+	$Game.start_game(save_directory)
 	set_screen($Game)
 	
 func _ready() -> void:

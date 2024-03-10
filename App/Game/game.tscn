@@ -1,9 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://cdbx1x8l6of0o"]
+[gd_scene load_steps=2 format=3 uid="uid://d1ynf8flgl4kp"]
 
-[ext_resource type="Script" path="res://NodeTypes/screen.gd" id="1_14p63"]
-[ext_resource type="PackedScene" uid="uid://b81ud1acmkygt" path="res://App/Game/game_instance.tscn" id="3_plmy1"]
+[ext_resource type="Script" path="res://App/Game/game.gd" id="1_fa6v7"]
 
-[node name="Game" type="CanvasLayer"]
-script = ExtResource("1_14p63")
-
-[node name="GameInstance" parent="." instance=ExtResource("3_plmy1")]
+[node name="Game" type="Control"]
+auto_translate_mode = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fa6v7")
