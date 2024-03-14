@@ -69,6 +69,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
+current_tab = 0
 
 [node name="Singleplayer" parent="Menus/Tabs" instance=ExtResource("4_jx5af")]
 layout_mode = 2

@@ -75,7 +75,7 @@ glow_bloom = 1.0
 glow_blend_mode = 4
 adjustment_enabled = true
 
-[node name="GameInstance" type="WorldNode"]
+[node name="GameInstance" type="Node"]
 script = ExtResource("1_q16sb")
 
 [node name="Layers" type="SubViewportContainer" parent="."]

@@ -4,7 +4,7 @@ extends Control
 
 @export var button_group = ButtonGroup.new()
 
-@export var save_directory: String = "user://Universe"
+@export var saves_directory: String = "user://Universe"
 
 var directory : DirAccess
 
@@ -29,21 +29,21 @@ func _on_visiblity_change() -> void:
 	refresh();
 
 func create() -> void:
-	if !DirAccess.dir_exists_absolute(save_directory):
-		DirAccess.make_dir_absolute(save_directory)
+	if !DirAccess.dir_exists_absolute(saves_directory):
+		DirAccess.make_dir_absolute(saves_directory)
 
 func refresh() -> void:
-	directory = DirAccess.open(save_directory)
+	directory = DirAccess.open(saves_directory)
 	
 	for child in game_list.get_children():
 		game_list.remove_child(child)
 	
-	for game_dir in directory.get_directories_at(save_directory):
+	for save_directory in directory.get_directories_at(saves_directory):
 		var game = GalaxyEntry.new()
 		
-		game.text = game_dir
+		game.text = save_directory
 		
-		game.galaxy_dir = game_dir
+		game.galaxy_dir = save_directory
 		
 		game.button_group = button_group
 		
