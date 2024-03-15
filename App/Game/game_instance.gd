@@ -3,10 +3,10 @@ extends Node
 var world: UniverseSimulation
 	
 func _enter_tree() -> void:
-	pass
+	world = UniverseSimulation.new()
 	
 func _exit_tree() -> void:
-	pass
+	world.stop_galaxy()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -23,6 +23,6 @@ func _process(delta: float) -> void:
 	$Layers/GameLayer/Speed.text = "Speed: " + str($Layers/GameLayer/Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
-	world.load(galaxy_directory)
+	world.start_local_galaxy(galaxy_directory)
 	world.start_rest_server()
 	world.set_threads(12)
