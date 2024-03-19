@@ -1,9 +1,20 @@
 extends Node
 
 var world: UniverseSimulation
+
+@export var mesh: Mesh
+
+var scenario: RID
 	
 func _enter_tree() -> void:
 	world = UniverseSimulation.new()
+	
+	scenario = $Layers/GameLayer.world_3d.scenario
+	
+	for i in range(100):
+		var id = world.create_instance(mesh.get_rid(), scenario)
+		
+		world.set_instance_pos(id, Vector3(randf_range(-100, 100), randf_range(-100, 100), randf_range(-100, 100)))
 	
 func _exit_tree() -> void:
 	world.stop_galaxy()
@@ -23,6 +34,6 @@ func _process(delta: float) -> void:
 	$Layers/GameLayer/Speed.text = "Speed: " + str($Layers/GameLayer/Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
-	world.start_local_galaxy(galaxy_directory)
-	world.start_rest_server()
 	world.set_threads(12)
+	world.start_rest_server()
+	world.start_local_galaxy(galaxy_directory)

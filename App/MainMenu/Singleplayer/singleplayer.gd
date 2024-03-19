@@ -38,7 +38,7 @@ func refresh() -> void:
 	for child in game_list.get_children():
 		game_list.remove_child(child)
 	
-	for save_directory in directory.get_directories_at(saves_directory):
+	for save_directory in directory.get_directories():
 		var game = GalaxyEntry.new()
 		
 		game.text = save_directory

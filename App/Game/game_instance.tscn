@@ -1,10 +1,12 @@
-[gd_scene load_steps=16 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=18 format=3 uid="uid://b81ud1acmkygt"]
 
 [ext_resource type="Script" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
 [ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1_q16sb"]
 [ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="1_wcy3j"]
 [ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Shaders/stars.tres" id="3_qhnjt"]
 [ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Shaders/galaxies.tres" id="4_qjjyv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_4kswg"]
 
 [sub_resource type="World3D" id="World3D_eflx2"]
 
@@ -45,15 +47,15 @@ script/source = "extends MultiMeshInstance3D
 func generate_galaxies() -> void:
 	multimesh.instance_count = 10000
 	
-	for i in range(10000):
-		var rotation = Vector3(randf_range(0, TAU), randf_range(0, TAU), randf_range(0, TAU))
-		var position = Vector3(randfn(0, 800), randfn(0, 800), randfn(0, 800))
+	for galaxy_index in range(10000):
+		var galaxy_rotation = Vector3(randf_range(0, TAU), randf_range(0, TAU), randf_range(0, TAU))
+		var galaxy_position = Vector3(randfn(0, 800), randfn(0, 800), randfn(0, 800))
 		
-		var transform: Transform3D
-		transform.basis = Basis.from_euler(rotation, EULER_ORDER_XYZ)
-		transform.origin = position
+		var galaxy_transform := Transform3D()
+		galaxy_transform.basis = Basis.from_euler(galaxy_rotation, EULER_ORDER_XYZ)
+		galaxy_transform.origin = galaxy_position
 		
-		multimesh.set_instance_transform(i, transform)
+		multimesh.set_instance_transform(galaxy_index, galaxy_transform)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -75,8 +77,11 @@ glow_bloom = 1.0
 glow_blend_mode = 4
 adjustment_enabled = true
 
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cg1bs"]
+
 [node name="GameInstance" type="Node"]
 script = ExtResource("1_q16sb")
+mesh = SubResource("BoxMesh_4kswg")
 
 [node name="Layers" type="SubViewportContainer" parent="."]
 anchors_preset = 15
@@ -134,3 +139,6 @@ transform = Transform3D(0.101434, 0.993072, -0.0593291, 0.322986, 0.0235332, 0.9
 [node name="Speed" type="Button" parent="Layers/GameLayer"]
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Layers/GameLayer"]
+mesh = SubResource("CapsuleMesh_cg1bs")

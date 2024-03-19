@@ -16,16 +16,16 @@ func generate_star(vertexes : PackedVector3Array, colors : PackedColorArray, i :
 
 func generate_stars_mesh(stars_mesh: Mesh) -> void:
 	# Make the mesh array
-	var stars_mesh_surface: Array
+	var stars_mesh_surface := Array()
 	stars_mesh_surface.resize(Mesh.ARRAY_MAX)
 	
 	# Make the vertex array and add it to the mesh
-	var vertexes: PackedVector3Array
+	var vertexes := PackedVector3Array()
 	vertexes.resize(star_count)
 	stars_mesh_surface[Mesh.ARRAY_VERTEX] = vertexes
 	
 	# Make the color array and add it to the mesh
-	var colors: PackedColorArray
+	var colors := PackedColorArray()
 	colors.resize(star_count)
 	stars_mesh_surface[Mesh.ARRAY_COLOR] = colors
 
