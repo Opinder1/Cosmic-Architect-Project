@@ -35,9 +35,9 @@ func load_galaxy(galaxy_directory: String) -> void:
 	
 	simulation.start_simulation()
 	
-	var scenario: RID = $Layers/GameLayer.world_3d.scenario
+	var scenario: RID = $Layers/GameLayer.find_world_3d().scenario
 	
-	for i in range(10):
+	for i in range(100):
 		var id: int = simulation.create_instance(mesh.get_rid(), scenario)
 		
 		simulation.set_instance_pos(id, Vector3(randf_range(-100, 100), randf_range(-100, 100), randf_range(-100, 100)))

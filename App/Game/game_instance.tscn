@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=17 format=3 uid="uid://b81ud1acmkygt"]
 
 [ext_resource type="Script" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
 [ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1_q16sb"]
@@ -6,9 +6,10 @@
 [ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Shaders/stars.tres" id="3_qhnjt"]
 [ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Shaders/galaxies.tres" id="4_qjjyv"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_4kswg"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3k40x"]
 
-[sub_resource type="World3D" id="World3D_eflx2"]
+[sub_resource type="BoxMesh" id="BoxMesh_4kswg"]
+material = SubResource("ShaderMaterial_3k40x")
 
 [sub_resource type="Environment" id="Environment_h16ae"]
 background_mode = 1
@@ -62,8 +63,6 @@ func _ready() -> void:
 	generate_galaxies()
 "
 
-[sub_resource type="World3D" id="World3D_dm67y"]
-
 [sub_resource type="Environment" id="Environment_6ioqx"]
 background_mode = 1
 background_color = Color(0, 0, 0, 0)
@@ -93,7 +92,6 @@ stretch = true
 
 [node name="StarsLayer" type="SubViewport" parent="Layers"]
 own_world_3d = true
-world_3d = SubResource("World3D_eflx2")
 handle_input_locally = false
 msaa_3d = 3
 size = Vector2i(1152, 648)
@@ -118,7 +116,6 @@ script = SubResource("GDScript_7vwvm")
 
 [node name="GameLayer" type="SubViewport" parent="Layers"]
 own_world_3d = true
-world_3d = SubResource("World3D_dm67y")
 transparent_bg = true
 handle_input_locally = false
 msaa_3d = 3
