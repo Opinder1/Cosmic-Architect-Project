@@ -11,6 +11,9 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	if simulation != null:
 		simulation.stop_simulation()
+		
+		universe.uninitialize(simulation)
+		
 		simulation = null
 		
 	universe = null
@@ -31,9 +34,9 @@ func _process(delta: float) -> void:
 	$Layers/GameLayer/Speed.text = "Speed: " + str($Layers/GameLayer/Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
-	simulation = universe.start_local_galaxy(galaxy_directory)
+	simulation = universe.initialize_local_galaxy(galaxy_directory)
 	
-	simulation.start_simulation()
+	simulation.start_simulation(UniverseSimulation.THREAD_MODE_SINGLE_THREADED)
 	
 	var scenario: RID = $Layers/GameLayer.find_world_3d().scenario
 	
