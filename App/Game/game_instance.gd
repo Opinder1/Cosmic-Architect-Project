@@ -36,11 +36,22 @@ func _process(delta: float) -> void:
 func load_galaxy(galaxy_directory: String) -> void:
 	simulation = universe.initialize_local_galaxy(galaxy_directory)
 	
+	var render_info: UniverseRenderInfo = UniverseRenderInfo.new()
+	
+	var game_scenario: RID = $Layers/GameLayer.find_world_3d().scenario
+	render_info.main_scenario = game_scenario
+	
+	var star_scenario: RID = $Layers/StarsLayer.find_world_3d().scenario
+	render_info.star_scenario = star_scenario
+	render_info.galaxy_scenario = game_scenario
+	
+	simulation.start_renderer(render_info)
+	
+	render_info.free()
+	
 	simulation.start_simulation(UniverseSimulation.THREAD_MODE_SINGLE_THREADED)
 	
-	var scenario: RID = $Layers/GameLayer.find_world_3d().scenario
-	
 	for i in range(100):
-		var id: int = simulation.create_instance(mesh.get_rid(), scenario)
+		var id: int = simulation.create_instance(mesh.get_rid(), game_scenario)
 		
 		simulation.set_instance_pos(id, Vector3(randf_range(-100, 100), randf_range(-100, 100), randf_range(-100, 100)))
