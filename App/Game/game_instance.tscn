@@ -101,6 +101,7 @@ render_target_update_mode = 4
 environment = SubResource("Environment_h16ae")
 
 [node name="Camera" type="Camera3D" parent="Layers/StarsLayer"]
+far = 1e+06
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Layers/StarsLayer"]
 transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
@@ -120,6 +121,7 @@ transparent_bg = true
 handle_input_locally = false
 msaa_3d = 3
 screen_space_aa = 1
+use_occlusion_culling = true
 size = Vector2i(1152, 648)
 render_target_update_mode = 4
 
@@ -128,6 +130,7 @@ environment = SubResource("Environment_6ioqx")
 
 [node name="Camera" type="Camera3D" parent="Layers/GameLayer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
+far = 1e+06
 script = ExtResource("1_wcy3j")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Layers/GameLayer"]
