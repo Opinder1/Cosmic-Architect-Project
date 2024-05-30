@@ -49,9 +49,4 @@ func load_galaxy(galaxy_directory: String) -> void:
 	
 	render_info.free()
 	
-	simulation.start_simulation(UniverseSimulation.THREAD_MODE_SINGLE_THREADED)
-	
-	for i in range(100):
-		var id: int = simulation.create_instance(mesh.get_rid(), game_scenario)
-		
-		simulation.set_instance_pos(id, Vector3(randf_range(-100, 100), randf_range(-100, 100), randf_range(-100, 100)))
+	simulation.start_simulation(UniverseSimulation.THREAD_MODE_MULTI_THREADED)
