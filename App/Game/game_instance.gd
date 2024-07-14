@@ -38,12 +38,7 @@ func load_galaxy(galaxy_directory: String) -> void:
 	
 	var render_info: UniverseRenderInfo = UniverseRenderInfo.new()
 	
-	var game_scenario: RID = $Layers/GameLayer.find_world_3d().scenario
-	render_info.main_scenario = game_scenario
-	
-	var star_scenario: RID = $Layers/StarsLayer.find_world_3d().scenario
-	render_info.star_scenario = star_scenario
-	render_info.galaxy_scenario = game_scenario
+	render_info.scenario = $Layers/GameLayer.find_world_3d().scenario
 	
 	simulation.start_renderer(render_info)
 	
