@@ -13,6 +13,9 @@ func _ready() -> void:
 	
 	set_screen($MenuScene)
 	overlay_screen($MainMenu)
+	
+func _process(delta: float) -> void:
+	CommandQueueServer.flush()
 
 func _input(event):
 	if event.is_action_released("in_game_pause_open"):
