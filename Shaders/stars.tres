@@ -50,7 +50,7 @@ render_mode blend_add, depth_draw_opaque, cull_back, diffuse_lambert, specular_s
 
 
 // Varyings
-varying float Bright;
+varying float var_Bright;
 
 
 
@@ -108,7 +108,7 @@ void vertex() {
 
 
 // VaryingSetter:29
-	Bright = n_out31p0;
+	var_Bright = n_out31p0;
 
 
 }
@@ -128,7 +128,7 @@ void fragment() {
 
 void light() {
 // VaryingGetter:3
-	float n_out3p0 = Bright;
+	float n_out3p0 = var_Bright;
 
 
 // Output:0
