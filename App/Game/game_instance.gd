@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 func load_galaxy(galaxy_directory: String) -> void:
 	simulation = universe.initialize_local_galaxy(galaxy_directory)
 	
-	var render_info: UniverseRenderInfo = UniverseRenderInfo.new()
+	var render_info := UniverseRenderInfo.new()
 	
 	render_info.scenario = $Layers/GameLayer.find_world_3d().scenario
 	
