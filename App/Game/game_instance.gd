@@ -27,13 +27,12 @@ func _process(delta: float) -> void:
 	
 	var transform: Transform3D = $Camera.transform
 	
-	$Stars.position = (-transform.origin / 10000)
-	$Galaxies.position = ((-transform.origin / 100000) / 100000)
-	
 	$Speed.text = "Speed: " + str($Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
 	simulation = universe.initialize_local_galaxy(galaxy_directory)
+	
+	$Camera.make_current()
 	
 	var render_info := UniverseRenderInfo.new()
 	

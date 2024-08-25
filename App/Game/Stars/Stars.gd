@@ -10,7 +10,7 @@ func generate_star(vertexes : PackedVector3Array, colors : PackedColorArray, i :
 	var z: float = randfn(0, 800)
 	var y: float = randfn(0, clamp(100 - (Vector2(x, z).length() / 32), 0, 32))
 	
-	vertexes[i] = Vector3(x, y, z)
+	vertexes[i] = Vector3(x * 10000, y * 10000, z * 10000)
 	
 	colors[i] = Color.from_hsv(randf_range(0, 1), randf_range(0, 0.5), 1) # Color can be anything though limit saturation to 50% to keep whiteness
 
