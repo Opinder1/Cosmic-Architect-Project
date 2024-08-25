@@ -20,7 +20,6 @@ glow_levels/4 = 1.0
 glow_levels/6 = 1.0
 glow_levels/7 = 1.0
 glow_intensity = 4.6
-glow_strength = 1.5
 glow_mix = 0.1
 glow_bloom = 1.0
 glow_blend_mode = 4
@@ -74,7 +73,7 @@ environment = SubResource("Environment_h16ae")
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
-far = 1e+07
+far = 1e+08
 script = ExtResource("1_wcy3j")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
@@ -95,5 +94,6 @@ script = ExtResource("1_cw5sh")
 material = SubResource("ShaderMaterial_qbocf")
 
 [node name="Galaxies" type="MultiMeshInstance3D" parent="."]
+visible = false
 multimesh = SubResource("MultiMesh_kmfr0")
 script = SubResource("GDScript_7vwvm")
