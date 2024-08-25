@@ -23,22 +23,21 @@ func _process(delta: float) -> void:
 	if (!simulation.progress(delta)):
 		printerr("world progress failed")
 	
-	$Layers/GameLayer/Camera.do_camera_controls(delta)
+	$Camera.do_camera_controls(delta)
 	
-	var transform: Transform3D = $Layers/GameLayer/Camera.transform
+	var transform: Transform3D = $Camera.transform
 	
-	$Layers/StarsLayer/Camera.transform.basis = transform.basis
-	$Layers/StarsLayer/Stars.position = (-transform.origin / 10000)
-	$Layers/StarsLayer/Galaxies.position = ((-transform.origin / 100000) / 100000)
+	$Stars.position = (-transform.origin / 10000)
+	$Galaxies.position = ((-transform.origin / 100000) / 100000)
 	
-	$Layers/GameLayer/Speed.text = "Speed: " + str($Layers/GameLayer/Camera.accelerator)
+	$Speed.text = "Speed: " + str($Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
 	simulation = universe.initialize_local_galaxy(galaxy_directory)
 	
 	var render_info := UniverseRenderInfo.new()
 	
-	render_info.scenario = $Layers/GameLayer.find_world_3d().scenario
+	render_info.scenario = get_viewport().find_world_3d().scenario
 	
 	simulation.start_renderer(render_info)
 	

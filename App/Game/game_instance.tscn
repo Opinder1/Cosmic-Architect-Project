@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=16 format=3 uid="uid://b81ud1acmkygt"]
 
 [ext_resource type="Script" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
 [ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1_q16sb"]
@@ -24,6 +24,8 @@ glow_strength = 1.5
 glow_mix = 0.1
 glow_bloom = 1.0
 glow_blend_mode = 4
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_cg1bs"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_binky"]
 
@@ -63,82 +65,35 @@ func _ready() -> void:
 	generate_galaxies()
 "
 
-[sub_resource type="Environment" id="Environment_6ioqx"]
-background_mode = 1
-background_color = Color(0, 0, 0, 0)
-glow_levels/1 = 1.0
-glow_levels/2 = 1.0
-glow_levels/4 = 1.0
-glow_levels/6 = 1.0
-glow_levels/7 = 1.0
-glow_intensity = 3.07
-glow_bloom = 1.0
-glow_blend_mode = 4
-adjustment_enabled = true
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_cg1bs"]
-
 [node name="GameInstance" type="Node"]
 script = ExtResource("1_q16sb")
 mesh = SubResource("BoxMesh_4kswg")
 
-[node name="Layers" type="SubViewportContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-stretch = true
-
-[node name="StarsLayer" type="SubViewport" parent="Layers"]
-own_world_3d = true
-handle_input_locally = false
-msaa_3d = 3
-size = Vector2i(1152, 648)
-render_target_update_mode = 4
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Layers/StarsLayer"]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_h16ae")
 
-[node name="Camera" type="Camera3D" parent="Layers/StarsLayer"]
-far = 1e+06
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Layers/StarsLayer"]
-transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
-
-[node name="Stars" type="MeshInstance3D" parent="Layers/StarsLayer"]
-mesh = SubResource("ArrayMesh_binky")
-script = ExtResource("1_cw5sh")
-material = SubResource("ShaderMaterial_qbocf")
-
-[node name="Galaxies" type="MultiMeshInstance3D" parent="Layers/StarsLayer"]
-multimesh = SubResource("MultiMesh_kmfr0")
-script = SubResource("GDScript_7vwvm")
-
-[node name="GameLayer" type="SubViewport" parent="Layers"]
-own_world_3d = true
-transparent_bg = true
-handle_input_locally = false
-msaa_3d = 3
-screen_space_aa = 1
-use_occlusion_culling = true
-size = Vector2i(1152, 648)
-render_target_update_mode = 4
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="Layers/GameLayer"]
-environment = SubResource("Environment_6ioqx")
-
-[node name="Camera" type="Camera3D" parent="Layers/GameLayer"]
+[node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
-far = 1e+06
+far = 1e+07
 script = ExtResource("1_wcy3j")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Layers/GameLayer"]
-transform = Transform3D(0.101434, 0.993072, -0.0593291, 0.322986, 0.0235332, 0.946111, 0.940952, -0.11513, -0.318361, 0, 0, 0)
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.101434, 0.993072, -0.059329, 0.322986, 0.0235331, 0.946111, 0.940952, -0.11513, -0.318361, 0, 0, 0)
 
-[node name="Speed" type="Button" parent="Layers/GameLayer"]
+[node name="Speed" type="Button" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Layers/GameLayer"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_cg1bs")
+skeleton = NodePath("")
+
+[node name="Stars" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_binky")
+skeleton = NodePath("")
+script = ExtResource("1_cw5sh")
+material = SubResource("ShaderMaterial_qbocf")
+
+[node name="Galaxies" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_kmfr0")
+script = SubResource("GDScript_7vwvm")
