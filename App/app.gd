@@ -16,6 +16,11 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	CommandQueueServer.flush()
+	
+func _exit_tree() -> void:
+	# Final flush for any left over commands
+	while CommandQueueServer.has_commands_left():
+		CommandQueueServer.flush()
 
 func _input(event):
 	if event.is_action_released("in_game_pause_open"):
