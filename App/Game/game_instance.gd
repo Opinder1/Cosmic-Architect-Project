@@ -30,16 +30,8 @@ func _process(delta: float) -> void:
 	$Speed.text = "Speed: " + str($Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
-	simulation = universe.initialize_local_galaxy(galaxy_directory)
+	simulation = universe.initialize_local_galaxy(galaxy_directory, get_viewport().find_world_3d().scenario)
 	
 	$Camera.make_current()
-	
-	var render_info := UniverseRenderInfo.new()
-	
-	render_info.scenario = get_viewport().find_world_3d().scenario
-	
-	simulation.start_renderer(render_info)
-	
-	render_info.free()
 	
 	simulation.start_simulation(UniverseSimulation.THREAD_MODE_MULTI_THREADED)
