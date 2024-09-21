@@ -12,7 +12,7 @@ func _exit_tree() -> void:
 	if simulation != null:
 		simulation.stop_simulation()
 		
-		universe.uninitialize(simulation)
+		simulation.finished_unloading()
 		
 		simulation = null
 		
@@ -30,8 +30,12 @@ func _process(delta: float) -> void:
 	$Speed.text = "Speed: " + str($Camera.accelerator)
 
 func load_galaxy(galaxy_directory: String) -> void:
-	simulation = universe.initialize_local_galaxy(galaxy_directory, get_viewport().find_world_3d().scenario)
+	simulation = UniverseSimulation.new()
+	
+	simulation.initialize(universe, galaxy_directory, "full_galaxy", UniverseSimulation.SERVER_TYPE_LOCAL, get_viewport().find_world_3d().scenario)
 	
 	$Camera.make_current()
 	
 	simulation.start_simulation(UniverseSimulation.THREAD_MODE_MULTI_THREADED)
+	
+	simulation.finished_loading()
