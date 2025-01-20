@@ -15,12 +15,12 @@ func _ready() -> void:
 	overlay_screen($MainMenu)
 	
 func _process(delta: float) -> void:
-	CommandQueueServer.flush()
+	CommandServer.flush()
 	
 func _exit_tree() -> void:
 	# Final flush for any left over commands
-	while CommandQueueServer.has_commands_left():
-		CommandQueueServer.flush()
+	while CommandServer.has_commands_left():
+		CommandServer.flush()
 
 func _input(event):
 	if event.is_action_released("in_game_pause_open"):

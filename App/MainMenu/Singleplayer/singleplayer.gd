@@ -4,7 +4,7 @@ extends Control
 
 @export var button_group = ButtonGroup.new()
 
-@export var saves_directory: String = "user://Universe"
+@export var saves_directory: String = "user://Universe/"
 
 var directory : DirAccess
 
@@ -57,7 +57,7 @@ func _on_press_play() -> void:
 		
 		print("play: ", button_group.get_pressed_button().galaxy_dir)
 		
-		selected_save.emit(save_directory)
+		selected_save.emit(saves_directory + save_directory)
 
 func _on_press_delete() -> void:
 	if (button_group.get_pressed_button()):
