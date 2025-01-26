@@ -4,7 +4,7 @@ extends Control
 
 @export var button_group = ButtonGroup.new()
 
-@export var saves_directory: String = "user://Universe/"
+var saves_directory: String = ProjectSettings.get("voxel_game/universe/path")
 
 var directory : DirAccess
 
@@ -53,11 +53,13 @@ func refresh() -> void:
 
 func _on_press_play() -> void:
 	if (button_group.get_pressed_button()):
-		var save_directory: String = button_group.get_pressed_button().galaxy_dir
+		var save: String = button_group.get_pressed_button().galaxy_dir
 		
-		print("play: ", button_group.get_pressed_button().galaxy_dir)
+		var save_directory: String = saves_directory.path_join(save)
 		
-		selected_save.emit(saves_directory + save_directory)
+		print("play: ", save_directory)
+		
+		selected_save.emit(save_directory)
 
 func _on_press_delete() -> void:
 	if (button_group.get_pressed_button()):
