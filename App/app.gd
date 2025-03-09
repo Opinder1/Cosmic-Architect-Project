@@ -1,11 +1,17 @@
 extends ScreenStack
 
+@onready var instance_schematic = preload("res://App/Game/game_instance.tscn")
+
 func _connect_signals() -> void:
 	$MainMenu.game_selected.connect(_on_game_selected)
 	
 func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	set_screen($LoadOverlay)
-	$Game.start_game(save_directory)
+	
+	UniverseServer.start_local_galaxy(save_directory, "full_galaxy", UniverseServer.SERVER_TYPE_LOCAL)
+	
+	$Game.add_child(instance_schematic.instantiate())
+
 	set_screen($Game)
 	
 func _ready() -> void:
@@ -17,7 +23,18 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	CommandServer.flush()
 	
+	UniverseServer.progress(delta)
+	
+func _enter_tree() -> void:
+	UniverseServer.set_render_scenario(get_viewport().find_world_3d().scenario)
+	
+	UniverseServer.start_simulation(UniverseServer.THREAD_MODE_MULTI_THREADED)
+	
 func _exit_tree() -> void:
+	UniverseServer.disconnect_from_galaxy()
+	
+	UniverseServer.stop_simulation()
+	
 	# Final flush for any left over commands
 	while CommandServer.has_commands_left():
 		CommandServer.flush()

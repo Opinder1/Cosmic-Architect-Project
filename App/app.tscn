@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://cxw86dgqbbixr"]
+[gd_scene load_steps=6 format=3 uid="uid://cxw86dgqbbixr"]
 
-[ext_resource type="Script" path="res://App/app.gd" id="1_ucuhh"]
-[ext_resource type="PackedScene" uid="uid://d1ynf8flgl4kp" path="res://App/Game/game.tscn" id="2_7b8mn"]
+[ext_resource type="Script" path="res://App/app.gd" id="1_6egwi"]
 [ext_resource type="PackedScene" uid="uid://d1vk18h1dvun1" path="res://App/MainMenu/main_menu.tscn" id="2_jb6t3"]
 [ext_resource type="Script" path="res://NodeTypes/screen.gd" id="6_a40to"]
 
@@ -16,10 +15,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_ucuhh")
+script = ExtResource("1_6egwi")
 
-[node name="Game" parent="." instance=ExtResource("2_7b8mn")]
+[node name="Game" type="Control" parent="."]
+auto_translate_mode = 1
 layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_a40to")
 
 [node name="MenuScene" type="Control" parent="."]
 layout_mode = 1
