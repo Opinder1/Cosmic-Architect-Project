@@ -8,7 +8,7 @@ func _connect_signals() -> void:
 func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	set_screen($LoadOverlay)
 	
-	UniverseServer.start_local_galaxy(save_directory, "full_galaxy", UniverseServer.SERVER_TYPE_LOCAL)
+	UniverseServer.start_local_galaxy(save_directory, "full_galaxy", UniverseServer.SERVER_TYPE_LOCAL, get_viewport().find_world_3d().scenario)
 	
 	$Game.add_child(instance_schematic.instantiate())
 
@@ -26,8 +26,6 @@ func _process(delta: float) -> void:
 	UniverseServer.progress(delta)
 	
 func _enter_tree() -> void:
-	UniverseServer.set_render_scenario(get_viewport().find_world_3d().scenario)
-	
 	UniverseServer.start_simulation(UniverseServer.THREAD_MODE_MULTI_THREADED)
 	
 func _exit_tree() -> void:
