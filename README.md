@@ -1,1 +1,1 @@
-The godot project for VoxelGame
+The godot project for Cosmic Architect
