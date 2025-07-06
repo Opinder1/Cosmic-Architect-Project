@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://y7sh33bbmhnq"]
 
-[ext_resource type="Script" path="res://App/MainMenu/Singleplayer/singleplayer.gd" id="1_a0dbl"]
+[ext_resource type="Script" uid="uid://dideee8rkr42o" path="res://App/MainMenu/Singleplayer/singleplayer.gd" id="1_a0dbl"]
 
 [node name="Singleplayer" type="VBoxContainer"]
 script = ExtResource("1_a0dbl")

@@ -1,8 +1,8 @@
 [gd_scene load_steps=6 format=3 uid="uid://cxw86dgqbbixr"]
 
-[ext_resource type="Script" path="res://App/app.gd" id="1_6egwi"]
+[ext_resource type="Script" uid="uid://c5rir311i0exw" path="res://App/app.gd" id="1_6egwi"]
 [ext_resource type="PackedScene" uid="uid://d1vk18h1dvun1" path="res://App/MainMenu/main_menu.tscn" id="2_jb6t3"]
-[ext_resource type="Script" path="res://NodeTypes/screen.gd" id="6_a40to"]
+[ext_resource type="Script" uid="uid://mv5uitjtibyh" path="res://NodeTypes/screen.gd" id="6_a40to"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
 

@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://d1vk18h1dvun1"]
 
-[ext_resource type="Script" path="res://App/MainMenu/main_menu.gd" id="1_qr4l1"]
+[ext_resource type="Script" uid="uid://cx3josp1hdgqb" path="res://App/MainMenu/main_menu.gd" id="1_qr4l1"]
 [ext_resource type="PackedScene" uid="uid://y7sh33bbmhnq" path="res://App/MainMenu/Singleplayer/singleplayer.tscn" id="4_jx5af"]
-[ext_resource type="Script" path="res://NodeTypes/screen.gd" id="4_s2ocw"]
+[ext_resource type="Script" uid="uid://mv5uitjtibyh" path="res://NodeTypes/screen.gd" id="4_s2ocw"]
 [ext_resource type="PackedScene" uid="uid://clekyrsrihh1w" path="res://App/MainMenu/Options/options.tscn" id="5_rqk1x"]
 
 [node name="MainMenu" type="Control"]

@@ -1,8 +1,8 @@
 [gd_scene load_steps=16 format=3 uid="uid://b81ud1acmkygt"]
 
-[ext_resource type="Script" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
-[ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1_q16sb"]
-[ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="1_wcy3j"]
+[ext_resource type="Script" uid="uid://dvwbw6p1jvs12" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
+[ext_resource type="Script" uid="uid://fnowgtmhgluq" path="res://App/Game/game_instance.gd" id="1_q16sb"]
+[ext_resource type="Script" uid="uid://c58pu1l17a8rq" path="res://App/Game/DebugCamera.gd" id="1_wcy3j"]
 [ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Shaders/stars.tres" id="3_qhnjt"]
 [ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Shaders/galaxies.tres" id="4_qjjyv"]
 
