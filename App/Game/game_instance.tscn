@@ -73,6 +73,7 @@ environment = SubResource("Environment_h16ae")
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
+far = 1e+06
 script = ExtResource("1_wcy3j")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
