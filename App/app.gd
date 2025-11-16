@@ -9,7 +9,13 @@ func _connect_signals() -> void:
 func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	set_screen($LoadOverlay)
 	
-	UniverseServer.start_local_universe(save_directory, "full_universe", UniverseServer.SERVER_TYPE_LOCAL, get_viewport().find_world_3d().scenario)
+	var args := Dictionary()
+	args["uuid"] = "00000000-0000-0000-0000-000000000000"
+	args["path"] = save_directory
+	args["fragment_type"] = "full_universe"
+	args["scenario"] = get_viewport().find_world_3d().scenario
+	
+	UniverseServer.start_local_universe(UniverseServer.SERVER_TYPE_LOCAL, args)
 	
 	$Game.add_child(instance_schematic.instantiate())
 
