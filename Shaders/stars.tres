@@ -13,7 +13,7 @@ varying_name = "Bright"
 input_name = "vertex"
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_1n6yx"]
-default_input_values = [0, 1e+06, 1, 0.0]
+default_input_values = [0, 1000000.0, 1, 0.0]
 operator = 3
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_l7ucf"]
@@ -39,7 +39,7 @@ operator = 3
 
 [resource]
 code = "shader_type spatial;
-render_mode blend_add, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx, shadows_disabled, ambient_light_disabled, vertex_lighting;
+render_mode blend_add, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx, shadows_disabled, ambient_light_disabled, vertex_lighting;
 
 
 // Varyings
@@ -120,7 +120,6 @@ void light() {
 
 }
 "
-graph_offset = Vector2(-358.637, 56.2619)
 modes/blend = 1
 flags/shadows_disabled = true
 flags/ambient_light_disabled = true
