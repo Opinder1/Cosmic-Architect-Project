@@ -12,10 +12,10 @@ func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	var args := Dictionary()
 	args["uuid"] = "00000000-0000-0000-0000-000000000000"
 	args["path"] = save_directory
-	args["fragment_type"] = "full_universe"
+	args["fragment_type"] = "full_client"
 	args["scenario"] = get_viewport().find_world_3d().scenario
 	
-	UniverseServer.start_local_universe(UniverseServer.SERVER_TYPE_LOCAL, args)
+	UniverseServer.start_server(UniverseServer.THREAD_MODE_MULTI_THREADED, args)
 	
 	$Game.add_child(instance_schematic.instantiate())
 
@@ -38,12 +38,10 @@ func _process(delta: float) -> void:
 	UniverseServer.progress(delta)
 	
 func _enter_tree() -> void:
-	UniverseServer.start_simulation(UniverseServer.THREAD_MODE_MULTI_THREADED)
+	pass
 	
 func _exit_tree() -> void:
-	UniverseServer.disconnect_from_universe()
-	
-	UniverseServer.stop_simulation()
+	UniverseServer.stop_server()
 	
 	UniverseServer.wait_until_stopped()
 	

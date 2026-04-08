@@ -16,7 +16,8 @@ func _process(delta: float) -> void:
 	
 	var transform: Transform3D = $Camera.transform
 	
-	UniverseServer.debug_command(&"set_debug_camera_transform", [transform])
+	if OS.is_debug_build():
+		UniverseServer.debug_command(&"set_debug_camera_transform", [transform])
 	
 	$Speed.text = "Speed: " + str($Camera.accelerator)
 
