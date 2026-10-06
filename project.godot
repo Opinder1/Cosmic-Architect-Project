@@ -10,14 +10,19 @@ config_version=5
 
 [application]
 
-config/name="VoxelGameDemo"
-run/main_scene="res://App/app.tscn"
+config/name="CosmicWanderer"
+run/main_scene="uid://cxw86dgqbbixr"
 config/features=PackedStringArray("4.5", "Double Precision", "Forward Plus")
+run/flush_stdout_on_print=true
 config/icon="res://Textures/icon.svg"
 
 [audio]
 
 buses/default_bus_layout=""
+
+[cosmic]
+
+universe/path="user://Multiverse/"
 
 [input]
 
@@ -81,7 +86,3 @@ in_game_pause_open={
 
 driver/threads/thread_model=2
 anti_aliasing/quality/msaa_3d=3
-
-[voxel_game]
-
-universe/path="user://Multiverse/"

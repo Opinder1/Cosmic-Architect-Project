@@ -4,7 +4,7 @@ extends Control
 
 @export var button_group = ButtonGroup.new()
 
-var saves_directory: String = ProjectSettings.get("voxel_game/universe/path")
+var saves_directory: String = ProjectSettings.get("cosmic/universe/path")
 
 var directory : DirAccess
 
