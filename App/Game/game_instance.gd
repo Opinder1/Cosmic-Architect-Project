@@ -132,7 +132,7 @@ func _apply_observer() -> void:
 	var extent: float = info.local_radius if in_galaxy else info.half_extent
 	$Camera.speed = 24.0 if in_planet else extent * (0.015 if in_system else 0.075)
 	$Camera.accelerator = 1.0
-	$Camera.far = 3500.0 if in_planet else max(extent * 8.0, 100.0)
+	$Camera.far = max($DimensionView.get_render_extent() + $Camera.position.length(), 3500.0 if in_planet else max(extent * 8.0, 100.0))
 	$Camera.space_movement = not in_planet
 
 func explore_nearest_galaxy() -> void:

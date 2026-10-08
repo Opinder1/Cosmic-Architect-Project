@@ -16,5 +16,5 @@ void fragment() {
 	float core = exp(-radius_squared * 12.0);
 	float glow = exp(-radius_squared * 5.0) * 0.3;
 	ALBEDO = mix(COLOR.rgb, vec3(1.0), core) * 3.0;
-	ALPHA = (core + glow) * (1.0 - smoothstep(0.6, 1.0, radius_squared));
+	ALPHA = (core + glow) * (1.0 - smoothstep(0.6, 1.0, radius_squared)) * COLOR.a;
 }

@@ -10,5 +10,5 @@ void fragment() {
 	float core = exp(-radius * radius * 100.0);
 	float fade = 1.0 - smoothstep(0.7, 1.0, radius);
 	ALBEDO = mix(COLOR.rgb, vec3(1.0, 0.9, 0.7), core) * 2.0;
-	ALPHA = (disc + core) * fade;
+	ALPHA = (disc + core) * fade * COLOR.a;
 }
