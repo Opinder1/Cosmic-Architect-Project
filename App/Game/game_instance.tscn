@@ -1,101 +1,69 @@
-[gd_scene load_steps=16 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=7 format=3 uid="uid://b81ud1acmkygt"]
 
-[ext_resource type="Script" uid="uid://dvwbw6p1jvs12" path="res://App/Game/Stars/Stars.gd" id="1_cw5sh"]
-[ext_resource type="Script" uid="uid://fnowgtmhgluq" path="res://App/Game/game_instance.gd" id="1_q16sb"]
-[ext_resource type="Script" uid="uid://c58pu1l17a8rq" path="res://App/Game/DebugCamera.gd" id="1_wcy3j"]
-[ext_resource type="Shader" uid="uid://bv7kd4h114sb3" path="res://Shaders/stars.tres" id="3_qhnjt"]
-[ext_resource type="Shader" uid="uid://l0s5fbtd8tt4" path="res://Shaders/galaxies.tres" id="4_qjjyv"]
+[ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1"]
+[ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="2"]
+[ext_resource type="Shader" path="res://Shaders/universe_galaxy.gdshader" id="3"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_3k40x"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_4kswg"]
-material = SubResource("ShaderMaterial_3k40x")
-
-[sub_resource type="Environment" id="Environment_h16ae"]
+[sub_resource type="Environment" id="Environment"]
 background_mode = 1
+background_color = Color(0.002, 0.003, 0.009, 1)
 glow_enabled = true
-glow_levels/1 = 1.0
-glow_levels/2 = 1.0
-glow_levels/4 = 1.0
-glow_levels/6 = 1.0
-glow_levels/7 = 1.0
-glow_intensity = 4.6
-glow_mix = 0.1
-glow_bloom = 1.0
-glow_blend_mode = 4
+glow_intensity = 0.8
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_cg1bs"]
+[sub_resource type="ShaderMaterial" id="GalaxyMaterial"]
+shader = ExtResource("3")
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_binky"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_qbocf"]
-render_priority = 0
-shader = ExtResource("3_qhnjt")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_21l4j"]
-render_priority = 0
-shader = ExtResource("4_qjjyv")
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_ovc6y"]
-material = SubResource("ShaderMaterial_21l4j")
-
-[sub_resource type="MultiMesh" id="MultiMesh_kmfr0"]
-transform_format = 1
-mesh = SubResource("PlaneMesh_ovc6y")
-
-[sub_resource type="GDScript" id="GDScript_7vwvm"]
-script/source = "extends MultiMeshInstance3D
-
-func generate_galaxies() -> void:
-	multimesh.instance_count = 10000
-	
-	for galaxy_index in range(10000):
-		var galaxy_rotation = Vector3(randf_range(0, TAU), randf_range(0, TAU), randf_range(0, TAU))
-		var galaxy_position = Vector3(randfn(0, 800), randfn(0, 800), randfn(0, 800))
-		
-		var galaxy_transform := Transform3D()
-		galaxy_transform.basis = Basis.from_euler(galaxy_rotation, EULER_ORDER_XYZ)
-		galaxy_transform.origin = galaxy_position
-		
-		multimesh.set_instance_transform(galaxy_index, galaxy_transform)
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	generate_galaxies()
-"
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.02, 0.025, 0.045, 0.88)
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_left = 8
+corner_radius_bottom_right = 8
 
 [node name="GameInstance" type="Node"]
-script = ExtResource("1_q16sb")
-mesh = SubResource("BoxMesh_4kswg")
+script = ExtResource("1")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_h16ae")
+environment = SubResource("Environment")
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.36882)
-far = 1000000.0
-script = ExtResource("1_wcy3j")
+near = 0.1
+far = 40000.0
+script = ExtResource("2")
+speed = 300.0
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.101434, 0.993072, -0.059329, 0.322986, 0.0235331, 0.946111, 0.940952, -0.11513, -0.318361, 0, 0, 0)
+[node name="DimensionView" type="DimensionView" parent="."]
+galaxy_material = SubResource("GalaxyMaterial")
 
-[node name="Speed" type="Button" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_cg1bs")
-skeleton = NodePath("")
+[node name="Panel" type="PanelContainer" parent="HUD"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 360.0
+theme_override_styles/panel = SubResource("PanelStyle")
 
-[node name="Stars" type="MeshInstance3D" parent="."]
-mesh = SubResource("ArrayMesh_binky")
-skeleton = NodePath("")
-script = ExtResource("1_cw5sh")
-material = SubResource("ShaderMaterial_qbocf")
+[node name="Content" type="VBoxContainer" parent="HUD/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="Galaxies" type="MultiMeshInstance3D" parent="."]
-visible = false
-multimesh = SubResource("MultiMesh_kmfr0")
-script = SubResource("GDScript_7vwvm")
+[node name="Title" type="Label" parent="HUD/Panel/Content"]
+layout_mode = 2
+text = "Universe exploration"
 
-[node name="GalaxyView" type="Node3D" parent="."]
+[node name="Status" type="Label" parent="HUD/Panel/Content"]
+layout_mode = 2
+
+[node name="Controls" type="Label" parent="HUD/Panel/Content"]
+layout_mode = 2
+text = "X — capture / release mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
+theme_override_colors/font_color = Color(0.65, 0.72, 0.85, 1)
+
+[node name="Return" type="Button" parent="HUD/Panel/Content"]
+layout_mode = 2
+focus_mode = 0
+text = "Save and return to menu"

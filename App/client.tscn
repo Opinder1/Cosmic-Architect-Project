@@ -1,15 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://cxw86dgqbbixr"]
+[gd_scene load_steps=5 format=3 uid="uid://cxw86dgqbbixr"]
 
 [ext_resource type="Script" uid="uid://c5rir311i0exw" path="res://App/client.gd" id="1_6egwi"]
 [ext_resource type="PackedScene" uid="uid://d1vk18h1dvun1" path="res://App/MainMenu/main_menu.tscn" id="2_jb6t3"]
 [ext_resource type="Script" uid="uid://mv5uitjtibyh" path="res://NodeTypes/screen.gd" id="6_a40to"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tl06j"]
-
-[sub_resource type="Environment" id="Environment_obw4t"]
-
-[sub_resource type="CosmicSimulation" id="CosmicSimulation_rtl02"]
-resource_name = "<null>"
 
 [node name="Client" type="Control"]
 layout_mode = 3
@@ -49,12 +44,6 @@ skeleton = NodePath("")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="MenuScene"]
 transform = Transform3D(0.689948, 0.600106, -0.404777, -0.145998, 0.663068, 0.734183, 0.708983, -0.447452, 0.545097, 0, 0, 0)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="MenuScene"]
-environment = SubResource("Environment_obw4t")
-
-[node name="DimensionView" type="DimensionView" parent="MenuScene"]
-simulation = SubResource("CosmicSimulation_rtl02")
 
 [node name="MainMenu" parent="." instance=ExtResource("2_jb6t3")]
 layout_mode = 1
