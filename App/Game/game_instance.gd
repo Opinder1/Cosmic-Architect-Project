@@ -25,7 +25,8 @@ func stop() -> Error:
 	$Camera.set_controls_active(false)
 	if not simulation.is_initialized():
 		return OK
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
+	$PlanetAvatar.leave_planet()
 	$DimensionView.simulation = null
 	return simulation.uninitialize()
 
@@ -36,14 +37,19 @@ func _exit_tree() -> void:
 
 func set_controls_active(active: bool) -> void:
 	$Camera.set_controls_active(active)
+	if not active and $PlanetAvatar.active:
+		$PlanetAvatar.walk(0.0, Vector2.ZERO, $Camera.rotation.y, false)
+
+func _observer_pose() -> Transform3D:
+	return $PlanetAvatar.transform if $PlanetAvatar.active else $Camera.transform
 
 func _process(delta: float) -> void:
 	if not simulation.is_initialized():
 		return
-	$Camera.do_camera_controls(delta)
-	# Planet surface coordinates are updated from the camera every frame while exploring.
-	if simulation.get_observer_planet() >= 0:
-		simulation.set_observer_transform($Camera.transform)
+	if $PlanetAvatar.active:
+		$PlanetAvatar.follow_camera($Camera)
+	else:
+		$Camera.do_camera_controls(delta)
 	simulation.process(delta)
 	_status_timer += delta
 	if _status_timer >= 0.2:
@@ -52,6 +58,12 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if simulation.is_initialized():
+		if $PlanetAvatar.active:
+			var direction := Vector2.ZERO
+			if $Camera.controls_active and $Camera.enabled:
+				direction = Input.get_vector("left", "right", "forward", "backward")
+			$PlanetAvatar.walk(delta, direction, $Camera.rotation.y, Input.is_action_pressed("speed"))
+			simulation.set_observer_transform(_observer_pose())
 		simulation.physics_process(delta)
 
 func _update_status() -> void:
@@ -75,13 +87,14 @@ func _update_status() -> void:
 	$HUD/Panel/Content/Title.text = save_directory.get_file() + " · " + location
 	var population := "%d resident voxel chunks" % simulation.get_loaded_planet_chunk_count() if in_planet else ("%d stars · %d planets and moons" % [simulation.get_loaded_star_count(), simulation.get_loaded_planet_count()] if in_system else ("%s star systems" % simulation.get_loaded_star_system_count() if in_galaxy else "%s galaxies" % info.galaxy_count))
 	$HUD/Panel/Content/Status.text = "%s\nPosition %s\nSpeed %.0f" % [
-		population, $Camera.position, $Camera.speed * $Camera.accelerator]
+		population, _observer_pose().origin, $PlanetAvatar.movement_speed if in_planet else $Camera.speed * $Camera.accelerator]
+	$HUD/Panel/Content/Controls.text = "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — walk · Shift — run\nG — return to system · Escape — pause" if in_planet else "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
 	$HUD/Panel/Content/Explore.visible = not in_planet
 	$HUD/Panel/Content/Leave.visible = in_galaxy
 	$HUD/Panel/Content/Explore.text = "Explore nearest planet (F)" if in_system else ("Explore nearest system (F)" if in_galaxy else "Explore nearest galaxy (F)")
 	$HUD/Panel/Content/Leave.text = "Return to system (G)" if in_planet else ("Return to galaxy (G)" if in_system else "Return to universe (G)")
 	if in_planet:
-		$HUD/Panel/Content/Target.text = "Surface height %.1f · Altitude %.1f" % [simulation.get_planet_surface_height($Camera.position.x, $Camera.position.z), $Camera.position.y - simulation.get_planet_surface_height($Camera.position.x, $Camera.position.z)]
+		$HUD/Panel/Content/Target.text = "Walking on the planet surface"
 		return
 	var target := _nearest_object()
 	if target.is_empty():
@@ -137,6 +150,13 @@ func _apply_observer() -> void:
 	$Camera.accelerator = 1.0
 	$Camera.far = max($DimensionView.get_render_extent() + $Camera.position.length(), 3500.0 if in_planet else max(extent * 8.0, 100.0))
 	$Camera.space_movement = not in_planet
+	if in_planet:
+		$PlanetAvatar.enter_planet(simulation, simulation.get_observer_transform())
+		$Camera.rotation = Vector3(-0.2, $PlanetAvatar.rotation.y, 0)
+		$PlanetAvatar.follow_camera($Camera)
+		simulation.set_observer_transform(_observer_pose())
+	else:
+		$PlanetAvatar.leave_planet()
 
 func explore_nearest_galaxy() -> void:
 	if not $Camera.controls_active or simulation.get_observer_galaxy() >= 0:
@@ -144,7 +164,7 @@ func explore_nearest_galaxy() -> void:
 	var target := _nearest_object()
 	if target.is_empty():
 		return
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
 	var error := simulation.enter_galaxy(target.id)
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not enter galaxy: " + error_string(error)
@@ -165,7 +185,7 @@ func explore_nearest_star_system() -> void:
 	var target := _nearest_object()
 	if target.is_empty():
 		return
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
 	var error := simulation.enter_star_system(target.id)
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not enter system: " + error_string(error)
@@ -192,15 +212,14 @@ func explore_nearest_planet() -> void:
 	var target := _nearest_object()
 	if target.is_empty():
 		return
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
 	var error := simulation.enter_planet(target.id)
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not enter planet: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
 		return
 	var height: float = simulation.get_planet_surface_height(0.0, 0.0)
-	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, height + 190.0, 250.0))
-	arrival = arrival.looking_at(Vector3(0, height, 0), Vector3.UP)
+	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, height, 0))
 	simulation.set_observer_transform(arrival)
 	_apply_observer()
 	$HUD/Panel/Content/Error.hide()
@@ -209,7 +228,7 @@ func explore_nearest_planet() -> void:
 func return_to_universe() -> void:
 	if not $Camera.controls_active:
 		return
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
 	var error := simulation.leave_galaxy()
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
@@ -223,7 +242,7 @@ func return_to_parent() -> void:
 	if not $Camera.controls_active:
 		return
 	if simulation.get_observer_planet() >= 0:
-		simulation.set_observer_transform($Camera.transform)
+		simulation.set_observer_transform(_observer_pose())
 		var error := simulation.leave_planet()
 		if error != OK:
 			$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
@@ -236,7 +255,7 @@ func return_to_parent() -> void:
 	if simulation.get_observer_star_system() < 0:
 		return_to_universe()
 		return
-	simulation.set_observer_transform($Camera.transform)
+	simulation.set_observer_transform(_observer_pose())
 	var error := simulation.leave_star_system()
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
