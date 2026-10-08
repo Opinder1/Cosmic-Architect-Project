@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=9 format=3 uid="uid://b81ud1acmkygt"]
 
 [ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1"]
 [ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="2"]
 [ext_resource type="Shader" path="res://Shaders/universe_galaxy.gdshader" id="3"]
+[ext_resource type="Shader" path="res://Shaders/galaxy_star.gdshader" id="4"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -12,6 +13,9 @@ glow_intensity = 0.8
 
 [sub_resource type="ShaderMaterial" id="GalaxyMaterial"]
 shader = ExtResource("3")
+
+[sub_resource type="ShaderMaterial" id="StarMaterial"]
+shader = ExtResource("4")
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
 bg_color = Color(0.02, 0.025, 0.045, 0.88)
@@ -38,6 +42,7 @@ speed = 300.0
 
 [node name="DimensionView" type="DimensionView" parent="."]
 galaxy_material = SubResource("GalaxyMaterial")
+star_material = SubResource("StarMaterial")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -62,6 +67,24 @@ layout_mode = 2
 layout_mode = 2
 text = "X — capture / release mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
 theme_override_colors/font_color = Color(0.65, 0.72, 0.85, 1)
+
+[node name="Target" type="Label" parent="HUD/Panel/Content"]
+layout_mode = 2
+
+[node name="Explore" type="Button" parent="HUD/Panel/Content"]
+layout_mode = 2
+focus_mode = 0
+text = "Explore nearest galaxy (F)"
+
+[node name="Leave" type="Button" parent="HUD/Panel/Content"]
+layout_mode = 2
+focus_mode = 0
+text = "Return to universe (G)"
+
+[node name="Error" type="Label" parent="HUD/Panel/Content"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.55, 0.45, 1)
 
 [node name="Return" type="Button" parent="HUD/Panel/Content"]
 layout_mode = 2
