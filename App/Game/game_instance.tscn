@@ -1,32 +1,34 @@
 [gd_scene load_steps=9 format=3 uid="uid://b81ud1acmkygt"]
 
-[ext_resource type="Script" path="res://App/Game/game_instance.gd" id="1"]
-[ext_resource type="Script" path="res://App/Game/DebugCamera.gd" id="2"]
-[ext_resource type="Shader" path="res://Shaders/universe_galaxy.gdshader" id="3"]
-[ext_resource type="Shader" path="res://Shaders/galaxy_star.gdshader" id="4"]
+[ext_resource type="Script" uid="uid://fnowgtmhgluq" path="res://App/Game/game_instance.gd" id="1"]
+[ext_resource type="Script" uid="uid://c58pu1l17a8rq" path="res://App/Game/DebugCamera.gd" id="2"]
+[ext_resource type="Shader" uid="uid://dv1jjievrkvch" path="res://Shaders/universe_galaxy.gdshader" id="3"]
+[ext_resource type="Shader" uid="uid://domxy3en6es7" path="res://Shaders/galaxy_star.gdshader" id="4"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
-background_color = Color(0.002, 0.003, 0.009, 1)
+ambient_light_source = 1
 glow_enabled = true
-glow_intensity = 0.8
+glow_bloom = 1.0
 
 [sub_resource type="ShaderMaterial" id="GalaxyMaterial"]
+render_priority = 0
 shader = ExtResource("3")
 
 [sub_resource type="ShaderMaterial" id="StarMaterial"]
+render_priority = 0
 shader = ExtResource("4")
 
 [sub_resource type="StyleBoxFlat" id="PanelStyle"]
-bg_color = Color(0.02, 0.025, 0.045, 0.88)
 content_margin_left = 18.0
 content_margin_top = 14.0
 content_margin_right = 18.0
 content_margin_bottom = 14.0
+bg_color = Color(0.02, 0.025, 0.045, 0.88)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
-corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="GameInstance" type="Node"]
 script = ExtResource("1")
@@ -38,7 +40,6 @@ environment = SubResource("Environment")
 near = 0.1
 far = 40000.0
 script = ExtResource("2")
-speed = 300.0
 
 [node name="DimensionView" type="DimensionView" parent="."]
 galaxy_material = SubResource("GalaxyMaterial")
@@ -65,8 +66,12 @@ layout_mode = 2
 
 [node name="Controls" type="Label" parent="HUD/Panel/Content"]
 layout_mode = 2
-text = "X — capture / release mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
 theme_override_colors/font_color = Color(0.65, 0.72, 0.85, 1)
+text = "Mouse — look around · X — release / capture
+Click world — capture mouse
+WASD — fly · Space / Ctrl — rise / fall
+Q / E — roll · Shift — accelerate
+Escape — pause / resume"
 
 [node name="Target" type="Label" parent="HUD/Panel/Content"]
 layout_mode = 2
