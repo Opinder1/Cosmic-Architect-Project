@@ -1,6 +1,7 @@
 extends MultiMeshInstance3D
 
 func generate_galaxies() -> void:
+	# This scene uses a cheap placeholder distribution for background decoration.
 	multimesh.instance_count = 10000
 	
 	for i in range(10000):

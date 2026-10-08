@@ -11,6 +11,7 @@ func _ready() -> void:
 	_set_mouse_look_enabled(controls_active)
 
 func _set_mouse_look_enabled(active: bool) -> void:
+	# Capturing the pointer is only valid when this camera currently owns controls.
 	enabled = active and controls_active
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if enabled else Input.MOUSE_MODE_VISIBLE
 
@@ -42,6 +43,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func do_camera_controls(delta: float) -> void:
 	if not enabled or not controls_active:
 		return
+	# Normalize combined keyboard input so diagonal movement is not faster.
 	var direction := Input.get_vector("left", "right", "forward", "backward")
 	var movement := Vector3(direction.x, Input.get_axis("down", "up"), direction.y)
 	if space_movement:
@@ -50,5 +52,6 @@ func do_camera_controls(delta: float) -> void:
 	else:
 		movement = movement.rotated(Vector3.UP, rotation.y)
 	position += movement.limit_length() * delta * accelerator * speed
+	# Exponential acceleration/deceleration scales smoothly across frame rates.
 	var acceleration := 1.0 + delta
 	accelerator = clamp(accelerator * acceleration if Input.is_action_pressed("speed") else accelerator / acceleration, 1.0, 100.0)

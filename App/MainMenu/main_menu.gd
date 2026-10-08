@@ -3,6 +3,7 @@ extends ScreenSwitch
 signal game_selected(save_directory: String, multiplayer: bool)
 
 func _connect_signals() -> void:
+	# Keep menu controls local; the client handles launching and owning the game instance.
 	$Title/Options/Singleplayer.pressed.connect(_on_singleplayer_pressed)
 	$Title/Options/Multiplayer.pressed.connect(_on_multiplayer_pressed)
 	$Title/Options/Options.pressed.connect(_on_options_pressed)
@@ -16,6 +17,7 @@ func _on_exit_pressed() -> void:
 	get_tree().quit()
 
 func _on_singleplayer_pressed() -> void:
+	# The menu tabs are one screen, so selecting an entry only changes the active tab.
 	push_screen($Menus)
 	$Menus/Tabs.current_tab = $Menus/Tabs/Singleplayer.get_index()
 

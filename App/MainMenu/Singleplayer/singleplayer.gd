@@ -32,6 +32,7 @@ func refresh(selected: String = "") -> void:
 	if directory == null:
 		_show_error("Could not open save directory: " + error_string(DirAccess.get_open_error()))
 		return
+	# Rebuild from disk so external save changes and newly-created saves appear together.
 	for child in game_list.get_children():
 		game_list.remove_child(child)
 		child.queue_free()
@@ -62,6 +63,7 @@ func _on_press_createnew() -> void:
 		refresh()
 		if directory == null:
 			return
+	# Pick the first unused numbered name without overwriting an existing universe.
 	var number := 1
 	while directory.dir_exists("Universe %d" % number):
 		number += 1

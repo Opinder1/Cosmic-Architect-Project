@@ -7,6 +7,7 @@ var simulation := CosmicSimulation.new()
 var _status_timer := 0.0
 
 func start(path: String) -> Error:
+	# Initialization is explicit so the caller can report load errors before adding this node.
 	save_directory = path
 	return simulation.initialize({"path": path, "fragment_type": "offline"})
 
@@ -20,6 +21,7 @@ func _ready() -> void:
 	_update_status()
 
 func stop() -> Error:
+	# Disable input before disconnecting the view, then let the simulation persist its state.
 	$Camera.set_controls_active(false)
 	if not simulation.is_initialized():
 		return OK
@@ -39,6 +41,7 @@ func _process(delta: float) -> void:
 	if not simulation.is_initialized():
 		return
 	$Camera.do_camera_controls(delta)
+	# Planet surface coordinates are updated from the camera every frame while exploring.
 	if simulation.get_observer_planet() >= 0:
 		simulation.set_observer_transform($Camera.transform)
 	simulation.process(delta)

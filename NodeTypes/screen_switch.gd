@@ -19,6 +19,7 @@ func transition_screen(screen: Screen) -> void:
 	
 ## Push a new screen on the stack
 func push_screen(screen: Screen) -> void:
+	# Hide the previous state but retain it so pop_screen can restore it.
 	if _state_stack.size() > 0:
 		_state_stack.back().set_visible(false)
 		

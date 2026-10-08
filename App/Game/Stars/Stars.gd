@@ -6,6 +6,7 @@ class_name Stars
 @export var material: Material
 
 func generate_star(vertexes : PackedVector3Array, colors : PackedColorArray, i : int) -> void:
+	# Spread stars through a flattened Gaussian so the generated field reads as a disc.
 	var x: float = randfn(0, 800)
 	var z: float = randfn(0, 800)
 	var y: float = randfn(0, clamp(100 - (Vector2(x, z).length() / 32), 0, 32))

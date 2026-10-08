@@ -1,6 +1,7 @@
 class_name ScreenStack extends Screen
 
 func _clear_screens() -> void:
+	# These screens are layered by child order, so clearing visibility preserves the stack layout.
 	for screen: Screen in get_children():
 		screen.set_visible(false)
 

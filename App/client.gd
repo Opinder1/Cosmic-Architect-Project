@@ -5,6 +5,7 @@ var current_game: Node
 var error_dialog: AcceptDialog
 
 func _ready() -> void:
+	# Keep the menu alive as an overlay so it can pause an active game and return to it.
 	$MainMenu.game_selected.connect(_on_game_selected)
 	error_dialog = AcceptDialog.new()
 	$MainMenu.add_child(error_dialog)
@@ -37,6 +38,7 @@ func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 func _close_game() -> bool:
 	if not is_instance_valid(current_game):
 		return true
+	# Stop before freeing so the simulation can save and release its world state.
 	var error: Error = current_game.stop()
 	current_game.get_parent().remove_child(current_game)
 	current_game.queue_free()
@@ -59,6 +61,7 @@ func _show_error(message: String) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_released("in_game_pause_open") and is_instance_valid(current_game):
+		# The menu's visibility is the pause state; keep camera controls and HUD in sync.
 		var paused: bool = not $MainMenu.visible
 		if paused:
 			overlay_screen($MainMenu)
