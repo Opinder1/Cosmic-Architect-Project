@@ -31,7 +31,7 @@ func _on_network_selected(address: String, port: int) -> void:
 		return
 	set_screen($LoadOverlay)
 	var instance = instance_schematic.instantiate()
-	var error: Error = instance.start_network(address, port, randi_range(1000000, 2000000000))
+	var error: Error = instance.start_network(address, port, CosmicSimulation.generate_instance_id())
 	_open_game(instance, error)
 
 func _open_game(instance: Node, error: Error) -> void:
