@@ -9,6 +9,7 @@ var _networked := false
 var _network_parent_id := -1
 var _pending_arrival := ""
 var _controls_allowed := true
+var _last_pilot := -1
 
 func start_network(address: String, port: int, player_id: int) -> Error:
 	_networked = true
@@ -23,6 +24,9 @@ func start(path: String) -> Error:
 
 func _ready() -> void:
 	$DimensionView.simulation = simulation
+	$SpaceShips.simulation = simulation
+	simulation.ships_changed.connect(_sync_ship_mode)
+	simulation.ship_command_result.connect(_on_ship_command_result)
 	if _networked:
 		simulation.world_changed.connect(_on_network_world_changed)
 		$Camera.set_controls_active(false)
@@ -33,6 +37,8 @@ func _ready() -> void:
 	$HUD/Panel/Content/Return.pressed.connect(func(): return_to_menu.emit())
 	$HUD/Panel/Content/Explore.pressed.connect(explore_nearest)
 	$HUD/Panel/Content/Leave.pressed.connect(return_to_parent)
+	$HUD/Panel/Content/Ship.pressed.connect(toggle_ship)
+	$HUD/Panel/Content/ShipLanding.pressed.connect(toggle_ship_landing)
 	_update_status()
 
 func stop() -> Error:
@@ -53,10 +59,14 @@ func _exit_tree() -> void:
 func set_controls_active(active: bool) -> void:
 	_controls_allowed = active
 	$Camera.set_controls_active(active and (not _networked or simulation.is_world_ready()))
+	if not active and simulation.get_piloted_ship() >= 0:
+		simulation.set_ship_controls(Vector3.ZERO, Vector3.ZERO, false)
 	if not active and $PlanetAvatar.active:
 		$PlanetAvatar.walk(0.0, Vector2.ZERO, $Camera.rotation.y, false)
 
 func _observer_pose() -> Transform3D:
+	if simulation.get_piloted_ship() >= 0:
+		return simulation.get_space_ship_info(simulation.get_piloted_ship()).world_transform
 	return $PlanetAvatar.transform if $PlanetAvatar.active else $Camera.transform
 
 func _process(delta: float) -> void:
@@ -66,7 +76,11 @@ func _process(delta: float) -> void:
 		simulation.process(delta)
 		if not simulation.is_world_ready():
 			return
-	if $PlanetAvatar.active:
+	_sync_ship_mode()
+	$SpaceShips.refresh()
+	if simulation.get_piloted_ship() >= 0:
+		$SpaceShips.follow_camera($Camera, simulation.get_space_ship_info(simulation.get_piloted_ship()))
+	elif $PlanetAvatar.active:
 		$PlanetAvatar.follow_camera($Camera)
 	else:
 		$Camera.do_camera_controls(delta)
@@ -81,13 +95,25 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if simulation.is_initialized() and (not _networked or simulation.is_world_ready()):
-		if $PlanetAvatar.active:
+		if simulation.get_piloted_ship() >= 0:
+			var thrust := Vector3.ZERO
+			var turn := Vector3.ZERO
+			if $Camera.controls_active and $Camera.enabled:
+				var direction := Input.get_vector("left", "right", "forward", "backward")
+				thrust = Vector3(direction.x, Input.get_axis("down", "up"), direction.y).limit_length()
+				turn = Vector3(-$Camera.ship_look.y, -$Camera.ship_look.x, 0) / maxf(delta, 0.001)
+				turn.z = Input.get_axis("roll_left", "roll_right")
+			$Camera.ship_look = Vector2.ZERO
+			simulation.set_ship_controls(thrust, turn, Input.is_action_pressed("speed") and $Camera.controls_active)
+		elif $PlanetAvatar.active:
 			var direction := Vector2.ZERO
 			if $Camera.controls_active and $Camera.enabled:
 				direction = Input.get_vector("left", "right", "forward", "backward")
 			$PlanetAvatar.walk(delta, direction, $Camera.rotation.y, Input.is_action_pressed("speed"))
 			simulation.set_observer_transform(_observer_pose())
-		simulation.physics_process(delta)
+		if _controls_allowed: simulation.physics_process(delta)
+		if simulation.get_piloted_ship() >= 0 and _networked:
+			simulation.set_observer_transform(_observer_pose())
 
 func _on_network_world_changed() -> void:
 	if not simulation.is_world_ready():
@@ -98,7 +124,9 @@ func _on_network_world_changed() -> void:
 		return
 	var parent_id: int = simulation.get_parent_info().id
 	if parent_id != _network_parent_id:
-		if _pending_arrival == "galaxy" or _pending_arrival == "star_system":
+		if simulation.get_piloted_ship() >= 0:
+			_pending_arrival = ""
+		elif _pending_arrival == "galaxy" or _pending_arrival == "star_system":
 			var info := simulation.get_galaxy_info(simulation.get_observer_galaxy()) if _pending_arrival == "galaxy" else simulation.get_star_system_info(simulation.get_observer_star_system())
 			var offset := Vector3(0, -0.6, 1.4) if _pending_arrival == "galaxy" else Vector3(0, -0.35, 1.15)
 			var arrival := Transform3D(Basis.IDENTITY, offset * info.local_radius).looking_at(Vector3.ZERO, Vector3.UP)
@@ -125,6 +153,7 @@ func _update_status() -> void:
 	var in_galaxy := galaxy_id >= 0
 	var in_system := system_id >= 0
 	var in_planet := planet_id >= 0
+	var piloting := simulation.get_piloted_ship() >= 0
 	var location := "Universe"
 	if in_planet:
 		var body := simulation.get_planet_info(planet_id)
@@ -138,12 +167,21 @@ func _update_status() -> void:
 	$HUD/Panel/Content/Status.text = "%s\nPosition %s\nSpeed %.0f" % [
 		population, _observer_pose().origin, $PlanetAvatar.movement_speed if in_planet else $Camera.speed * $Camera.accelerator]
 	$HUD/Panel/Content/Controls.text = "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — walk · Shift — run\nG — return to system · Escape — pause" if in_planet else "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
+	$HUD/Panel/Content/Ship.visible = in_system
+	$HUD/Panel/Content/ShipLanding.visible = piloting
+	$HUD/Panel/Content/Ship.text = "Disembark (B)" if piloting else "Board / deploy scout (B)"
+	if piloting:
+		var ship := simulation.get_space_ship_info(simulation.get_piloted_ship())
+		$HUD/Panel/Content/Status.text = "%s · %s\nSpeed %.1f · Position %s" % [ship.name, "Landed" if ship.landed else "Flying", ship.velocity.length(), ship.world_transform.origin]
+		$HUD/Panel/Content/Controls.text = "Mouse — steer · X — release / capture\nWASD — thrust · Space / Ctrl — rise / fall\nQ / E — roll · Shift — boost\nRelease thrust — brake\nL — land / launch · B — disembark\nF — approach planet · G — return to system"
+		$HUD/Panel/Content/ShipLanding.text = "Launch (L)" if ship.landed else ("Land (L)" if in_planet else "Dock nearby (L)")
+		$HUD/Panel/Content/Leave.visible = in_planet
 	$HUD/Panel/Content/Explore.visible = not in_planet
-	$HUD/Panel/Content/Leave.visible = in_galaxy
+	$HUD/Panel/Content/Leave.visible = in_planet if piloting else in_galaxy
 	$HUD/Panel/Content/Explore.text = "Explore nearest planet (F)" if in_system else ("Explore nearest system (F)" if in_galaxy else "Explore nearest galaxy (F)")
 	$HUD/Panel/Content/Leave.text = "Return to system (G)" if in_planet else ("Return to galaxy (G)" if in_system else "Return to universe (G)")
 	if in_planet:
-		$HUD/Panel/Content/Target.text = "Walking on the planet surface"
+		$HUD/Panel/Content/Target.text = "Land within 80 units of the surface, below speed 20" if piloting else "Walking on the planet surface"
 		return
 	var target := _nearest_object()
 	if target.is_empty():
@@ -164,7 +202,7 @@ func _nearest_object() -> Dictionary:
 	if info.is_empty():
 		return {}
 	var extent: float = info.local_radius if in_galaxy else info.half_extent
-	var position: Vector3 = $Camera.position
+	var position: Vector3 = _observer_pose().origin
 	# Expand a sphere until it contains an object. Every closer object is then
 	# included, so selecting its minimum gives the true nearest object.
 	var radius: float = max(extent * 0.05, position.length() - extent * 1.75)
@@ -199,6 +237,11 @@ func _apply_observer() -> void:
 	$Camera.accelerator = 1.0
 	$Camera.far = max($DimensionView.get_render_extent() + $Camera.position.length(), 3500.0 if in_planet else max(extent * 8.0, 100.0))
 	$Camera.space_movement = not in_planet
+	if simulation.get_piloted_ship() >= 0:
+		_sync_ship_mode()
+		$SpaceShips.refresh()
+		$SpaceShips.follow_camera($Camera, simulation.get_space_ship_info(simulation.get_piloted_ship()))
+		return
 	if in_planet:
 		$PlanetAvatar.enter_planet(simulation, simulation.get_observer_transform())
 		$Camera.rotation = Vector3(-0.2, $PlanetAvatar.rotation.y, 0)
@@ -206,6 +249,49 @@ func _apply_observer() -> void:
 		simulation.set_observer_transform(_observer_pose())
 	else:
 		$PlanetAvatar.leave_planet()
+
+func _sync_ship_mode() -> void:
+	var pilot := simulation.get_piloted_ship()
+	$Camera.ship_controls = pilot >= 0
+	if pilot == _last_pilot: return
+	_last_pilot = pilot
+	$Camera.ship_look = Vector2.ZERO
+	if pilot >= 0:
+		$PlanetAvatar.leave_planet()
+	elif simulation.is_world_ready():
+		$Camera.near = 0.1
+		_apply_observer()
+	_update_status()
+
+func _on_ship_command_result(action: String, error: int) -> void:
+	if error != OK:
+		$HUD/Panel/Content/Error.text = "Ship " + action + ": " + error_string(error)
+		$HUD/Panel/Content/Error.show()
+	else:
+		$HUD/Panel/Content/Error.hide()
+
+func toggle_ship() -> void:
+	if not $Camera.controls_active or not simulation.is_world_ready(): return
+	simulation.set_observer_transform(_observer_pose())
+	var error := simulation.disembark_space_ship() if simulation.get_piloted_ship() >= 0 else simulation.deploy_space_ship()
+	_on_ship_command_result("boarding", error)
+	_sync_ship_mode()
+	$SpaceShips.refresh()
+	_update_status()
+
+func toggle_ship_landing() -> void:
+	if not $Camera.controls_active or simulation.get_piloted_ship() < 0: return
+	var info := simulation.get_space_ship_info(simulation.get_piloted_ship())
+	var error: int
+	if info.landed:
+		error = simulation.launch_space_ship()
+	elif simulation.get_observer_planet() >= 0:
+		error = simulation.land_space_ship()
+	else:
+		var dock: Dictionary = $SpaceShips.nearest_dock(info)
+		error = ERR_DOES_NOT_EXIST if dock.is_empty() else simulation.dock_space_ship(dock.type, dock.id)
+	_on_ship_command_result("landing", error)
+	_update_status()
 
 func explore_nearest_galaxy() -> void:
 	if not $Camera.controls_active or simulation.get_observer_galaxy() >= 0:
@@ -276,6 +362,10 @@ func explore_nearest_planet() -> void:
 	if _networked:
 		_pending_arrival = "planet"
 		return
+	if simulation.get_piloted_ship() >= 0:
+		_apply_observer()
+		_update_status()
+		return
 	var height: float = simulation.get_planet_surface_height(0.0, 0.0)
 	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, height, 0))
 	simulation.set_observer_transform(arrival)
@@ -336,4 +426,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_G:
 			return_to_parent()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_B:
+			toggle_ship()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_L:
+			toggle_ship_landing()
 			get_viewport().set_input_as_handled()

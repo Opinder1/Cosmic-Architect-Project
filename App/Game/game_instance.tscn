@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://b81ud1acmkygt"]
+[gd_scene load_steps=11 format=3 uid="uid://b81ud1acmkygt"]
 
 [ext_resource type="Script" uid="uid://fnowgtmhgluq" path="res://App/Game/game_instance.gd" id="1"]
 [ext_resource type="Script" uid="uid://c58pu1l17a8rq" path="res://App/Game/DebugCamera.gd" id="2"]
 [ext_resource type="Shader" uid="uid://dv1jjievrkvch" path="res://Shaders/universe_galaxy.gdshader" id="3"]
 [ext_resource type="Shader" uid="uid://domxy3en6es7" path="res://Shaders/galaxy_star.gdshader" id="4"]
 [ext_resource type="Script" path="res://App/Game/planet_avatar.gd" id="5"]
+[ext_resource type="Script" path="res://App/Game/space_ships.gd" id="6"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -48,6 +49,9 @@ star_material = SubResource("StarMaterial")
 
 [node name="PlanetAvatar" type="Node3D" parent="."]
 script = ExtResource("5")
+
+[node name="SpaceShips" type="Node3D" parent="."]
+script = ExtResource("6")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -94,6 +98,16 @@ text = "Return to universe (G)"
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.55, 0.45, 1)
+
+[node name="Ship" type="Button" parent="HUD/Panel/Content"]
+layout_mode = 2
+focus_mode = 0
+text = "Board scout (B)"
+
+[node name="ShipLanding" type="Button" parent="HUD/Panel/Content"]
+layout_mode = 2
+focus_mode = 0
+text = "Land / launch (L)"
 
 [node name="Return" type="Button" parent="HUD/Panel/Content"]
 layout_mode = 2

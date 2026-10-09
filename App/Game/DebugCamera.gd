@@ -6,6 +6,8 @@ class_name TestCamera extends Camera3D
 var accelerator: float = 1.0
 var enabled: bool = false
 var controls_active: bool = true
+var ship_controls := false
+var ship_look := Vector2.ZERO
 
 func _ready() -> void:
 	_set_mouse_look_enabled(controls_active)
@@ -13,6 +15,7 @@ func _ready() -> void:
 func _set_mouse_look_enabled(active: bool) -> void:
 	# Capturing the pointer is only valid when this camera currently owns controls.
 	enabled = active and controls_active
+	ship_look = Vector2.ZERO
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if enabled else Input.MOUSE_MODE_VISIBLE
 
 func set_controls_active(active: bool) -> void:
@@ -21,6 +24,10 @@ func set_controls_active(active: bool) -> void:
 
 func _input(event: InputEvent) -> void:
 	if not controls_active or not enabled or not event is InputEventMouseMotion:
+		return
+	if ship_controls:
+		ship_look += event.relative * mouse_sensitivity
+		get_viewport().set_input_as_handled()
 		return
 	if space_movement:
 		rotate_object_local(Vector3.RIGHT, -event.relative.y * mouse_sensitivity)
