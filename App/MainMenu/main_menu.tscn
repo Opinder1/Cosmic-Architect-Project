@@ -78,6 +78,36 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
+[node name="Connection" type="VBoxContainer" parent="Menus/Tabs/Multiplayer"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 384.0
+offset_bottom = 220.0
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Menus/Tabs/Multiplayer/Connection"]
+layout_mode = 2
+text = "Join a universe"
+
+[node name="Address" type="LineEdit" parent="Menus/Tabs/Multiplayer/Connection"]
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "Server address"
+
+[node name="PortLabel" type="Label" parent="Menus/Tabs/Multiplayer/Connection"]
+layout_mode = 2
+text = "Port"
+
+[node name="Port" type="SpinBox" parent="Menus/Tabs/Multiplayer/Connection"]
+layout_mode = 2
+min_value = 1.0
+max_value = 65535.0
+value = 41000.0
+
+[node name="Connect" type="Button" parent="Menus/Tabs/Multiplayer/Connection"]
+layout_mode = 2
+text = "Connect"
+
 [node name="Options" parent="Menus/Tabs" instance=ExtResource("5_rqk1x")]
 layout_mode = 2
 

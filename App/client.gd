@@ -7,6 +7,7 @@ var error_dialog: AcceptDialog
 func _ready() -> void:
 	# Keep the menu alive as an overlay so it can pause an active game and return to it.
 	$MainMenu.game_selected.connect(_on_game_selected)
+	$MainMenu.network_selected.connect(_on_network_selected)
 	error_dialog = AcceptDialog.new()
 	$MainMenu.add_child(error_dialog)
 	set_screen($MenuScene)
@@ -14,7 +15,7 @@ func _ready() -> void:
 
 func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	if is_multiplayer:
-		_show_error("Multiplayer sessions are not available yet.")
+		_on_network_selected(save_directory, 41000)
 		return
 	if not _close_game():
 		set_screen($MenuScene)
@@ -23,6 +24,17 @@ func _on_game_selected(save_directory: String, is_multiplayer: bool) -> void:
 	set_screen($LoadOverlay)
 	var instance = instance_schematic.instantiate()
 	var error: Error = instance.start(save_directory)
+	_open_game(instance, error)
+
+func _on_network_selected(address: String, port: int) -> void:
+	if not _close_game():
+		return
+	set_screen($LoadOverlay)
+	var instance = instance_schematic.instantiate()
+	var error: Error = instance.start_network(address, port, randi_range(1000000, 2000000000))
+	_open_game(instance, error)
+
+func _open_game(instance: Node, error: Error) -> void:
 	if error != OK:
 		instance.free()
 		set_screen($MenuScene)

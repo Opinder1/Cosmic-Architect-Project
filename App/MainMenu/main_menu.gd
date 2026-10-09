@@ -1,6 +1,7 @@
 extends ScreenSwitch
 
 signal game_selected(save_directory: String, multiplayer: bool)
+signal network_selected(address: String, port: int)
 
 func _connect_signals() -> void:
 	# Keep menu controls local; the client handles launching and owning the game instance.
@@ -10,6 +11,8 @@ func _connect_signals() -> void:
 	$Title/Options/Exit.pressed.connect(_on_exit_pressed)
 	
 	$Menus/Tabs/Singleplayer.selected_save.connect(_selected_singleplayer_save)
+	$Menus/Tabs/Multiplayer/Connection/Connect.pressed.connect(func():
+		network_selected.emit($Menus/Tabs/Multiplayer/Connection/Address.text.strip_edges(), int($Menus/Tabs/Multiplayer/Connection/Port.value)))
 	
 	$Menus/Controls/Back.pressed.connect(_on_back)
 

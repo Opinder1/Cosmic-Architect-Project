@@ -5,6 +5,16 @@ signal return_to_menu
 @export var save_directory: String
 var simulation := CosmicSimulation.new()
 var _status_timer := 0.0
+var _networked := false
+var _network_parent_id := -1
+var _pending_arrival := ""
+var _controls_allowed := true
+
+func start_network(address: String, port: int, player_id: int) -> Error:
+	_networked = true
+	save_directory = address + ":" + str(port)
+	return simulation.initialize({"fragment_type": "client", "node_id": player_id,
+		"server_address": address, "server_port": port})
 
 func start(path: String) -> Error:
 	# Initialization is explicit so the caller can report load errors before adding this node.
@@ -13,7 +23,12 @@ func start(path: String) -> Error:
 
 func _ready() -> void:
 	$DimensionView.simulation = simulation
-	_apply_observer()
+	if _networked:
+		simulation.world_changed.connect(_on_network_world_changed)
+		$Camera.set_controls_active(false)
+		$HUD/Panel/Content/Title.text = "Connecting to " + save_directory
+	else:
+		_apply_observer()
 	$Camera.make_current()
 	$HUD/Panel/Content/Return.pressed.connect(func(): return_to_menu.emit())
 	$HUD/Panel/Content/Explore.pressed.connect(explore_nearest)
@@ -36,7 +51,8 @@ func _exit_tree() -> void:
 		push_error("Could not save universe: " + error_string(error))
 
 func set_controls_active(active: bool) -> void:
-	$Camera.set_controls_active(active)
+	_controls_allowed = active
+	$Camera.set_controls_active(active and (not _networked or simulation.is_world_ready()))
 	if not active and $PlanetAvatar.active:
 		$PlanetAvatar.walk(0.0, Vector2.ZERO, $Camera.rotation.y, false)
 
@@ -46,18 +62,25 @@ func _observer_pose() -> Transform3D:
 func _process(delta: float) -> void:
 	if not simulation.is_initialized():
 		return
+	if _networked:
+		simulation.process(delta)
+		if not simulation.is_world_ready():
+			return
 	if $PlanetAvatar.active:
 		$PlanetAvatar.follow_camera($Camera)
 	else:
 		$Camera.do_camera_controls(delta)
-	simulation.process(delta)
+		if _networked:
+			simulation.set_observer_transform(_observer_pose())
+	if not _networked:
+		simulation.process(delta)
 	_status_timer += delta
 	if _status_timer >= 0.2:
 		_status_timer = 0.0
 		_update_status()
 
 func _physics_process(delta: float) -> void:
-	if simulation.is_initialized():
+	if simulation.is_initialized() and (not _networked or simulation.is_world_ready()):
 		if $PlanetAvatar.active:
 			var direction := Vector2.ZERO
 			if $Camera.controls_active and $Camera.enabled:
@@ -65,6 +88,32 @@ func _physics_process(delta: float) -> void:
 			$PlanetAvatar.walk(delta, direction, $Camera.rotation.y, Input.is_action_pressed("speed"))
 			simulation.set_observer_transform(_observer_pose())
 		simulation.physics_process(delta)
+
+func _on_network_world_changed() -> void:
+	if not simulation.is_world_ready():
+		_network_parent_id = -1
+		$Camera.set_controls_active(false)
+		$PlanetAvatar.leave_planet()
+		$HUD/Panel/Content/Title.text = "Waiting for server data"
+		return
+	var parent_id: int = simulation.get_parent_info().id
+	if parent_id != _network_parent_id:
+		if _pending_arrival == "galaxy" or _pending_arrival == "star_system":
+			var info := simulation.get_galaxy_info(simulation.get_observer_galaxy()) if _pending_arrival == "galaxy" else simulation.get_star_system_info(simulation.get_observer_star_system())
+			var offset := Vector3(0, -0.6, 1.4) if _pending_arrival == "galaxy" else Vector3(0, -0.35, 1.15)
+			var arrival := Transform3D(Basis.IDENTITY, offset * info.local_radius).looking_at(Vector3.ZERO, Vector3.UP)
+			simulation.set_observer_transform(arrival)
+		elif _pending_arrival == "planet":
+			simulation.set_observer_transform(Transform3D())
+		if simulation.get_observer_planet() >= 0:
+			var position := simulation.get_observer_transform().origin
+			if not is_finite(simulation.get_planet_surface_height(position.x, position.z)):
+				return
+		_apply_observer()
+		_network_parent_id = parent_id
+		_pending_arrival = ""
+		$Camera.set_controls_active(_controls_allowed)
+	_update_status()
 
 func _update_status() -> void:
 	var info := simulation.get_universe_info()
@@ -170,6 +219,9 @@ func explore_nearest_galaxy() -> void:
 		$HUD/Panel/Content/Error.text = "Could not enter galaxy: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
 		return
+	if _networked:
+		_pending_arrival = "galaxy"
+		return
 	# Explore is an explicit trip to a useful overview of the selected galaxy.
 	# The simulation also supports exact coordinate conversion without this trip.
 	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, -0.6, 1.4) * target.local_radius)
@@ -190,6 +242,9 @@ func explore_nearest_star_system() -> void:
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not enter system: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
+		return
+	if _networked:
+		_pending_arrival = "star_system"
 		return
 	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, -0.35, 1.15) * target.local_radius)
 	arrival = arrival.looking_at(Vector3.ZERO, Vector3.UP)
@@ -218,6 +273,9 @@ func explore_nearest_planet() -> void:
 		$HUD/Panel/Content/Error.text = "Could not enter planet: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
 		return
+	if _networked:
+		_pending_arrival = "planet"
+		return
 	var height: float = simulation.get_planet_surface_height(0.0, 0.0)
 	var arrival := Transform3D(Basis.IDENTITY, Vector3(0, height, 0))
 	simulation.set_observer_transform(arrival)
@@ -234,6 +292,8 @@ func return_to_universe() -> void:
 		$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
 		return
+	if _networked:
+		return
 	_apply_observer()
 	$HUD/Panel/Content/Error.hide()
 	_update_status()
@@ -248,6 +308,8 @@ func return_to_parent() -> void:
 			$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
 			$HUD/Panel/Content/Error.show()
 			return
+		if _networked:
+			return
 		_apply_observer()
 		$HUD/Panel/Content/Error.hide()
 		_update_status()
@@ -260,6 +322,8 @@ func return_to_parent() -> void:
 	if error != OK:
 		$HUD/Panel/Content/Error.text = "Could not return: " + error_string(error)
 		$HUD/Panel/Content/Error.show()
+		return
+	if _networked:
 		return
 	_apply_observer()
 	$HUD/Panel/Content/Error.hide()

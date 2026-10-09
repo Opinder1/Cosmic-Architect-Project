@@ -95,6 +95,9 @@ func walk(delta: float, input: Vector2, camera_yaw: float, running: bool) -> voi
 	destination.x = clamp(destination.x, -1e7, 1e7)
 	destination.z = clamp(destination.z, -1e7, 1e7)
 	destination.y = ground_height(destination.x, destination.z)
+	if not is_finite(destination.y):
+		movement_speed = 0.0
+		return
 	position = destination
 	movement_speed = direction.length() * speed
 	if direction.length_squared() > 0.0001:
