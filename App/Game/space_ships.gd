@@ -16,7 +16,7 @@ func refresh() -> void:
 		present[info.id] = true
 		if not _ships.has(info.id):
 			var instance := MeshInstance3D.new()
-			instance.name = "Ship_" + str(info.id)
+			instance.name = "Ship_" + CosmicSimulation.instance_id_to_string(info.id)
 			instance.mesh = _voxel_mesh(simulation.get_space_ship_volume(info.id))
 			var material := StandardMaterial3D.new()
 			material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
