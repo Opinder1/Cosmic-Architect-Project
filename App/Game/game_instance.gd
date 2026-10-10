@@ -163,6 +163,7 @@ func _update_status() -> void:
 	elif in_galaxy:
 		location = "Galaxy %d" % (simulation.get_galaxy_info(galaxy_id).ordinal + 1)
 	$HUD/Panel/Content/Title.text = save_directory.get_file() + " · " + location
+	_update_ancestry(galaxy_id, system_id, planet_id)
 	var population := "%d resident voxel chunks" % simulation.get_loaded_planet_chunk_count() if in_planet else ("%d stars · %d planets and moons" % [simulation.get_loaded_star_count(), simulation.get_loaded_planet_count()] if in_system else ("%s star systems" % simulation.get_loaded_star_system_count() if in_galaxy else "%s galaxies" % info.galaxy_count))
 	$HUD/Panel/Content/Status.text = "%s\nPosition %s\nSpeed %.0f" % [
 		population, _observer_pose().origin, $PlanetAvatar.movement_speed if in_planet else $Camera.speed * $Camera.accelerator]
@@ -192,6 +193,33 @@ func _update_status() -> void:
 		var name: String = ("Moon %d" % (target.ordinal + 1) if (target.parent_planet != Vector4i.ZERO) else "Planet %d" % (target.ordinal + 1)) if in_system else ("System %d" % (target.ordinal + 1) if in_galaxy else "Galaxy %d" % (target.ordinal + 1))
 		var position: Vector3 = target.position if in_galaxy else target.transform.origin
 		$HUD/Panel/Content/Target.text = "Nearest: %s\nDistance: %.1f local units" % [name, position.distance_to($Camera.position)]
+
+func _update_ancestry(galaxy_id: Vector4i, system_id: Vector4i, planet_id: Vector4i) -> void:
+	var entries := PackedStringArray()
+	var universe := simulation.get_universe_info()
+	if not universe.is_empty():
+		entries.append(_ancestry_entry("Universe", universe.id))
+	if galaxy_id != Vector4i.ZERO:
+		var galaxy := simulation.get_galaxy_info(galaxy_id)
+		if not galaxy.is_empty():
+			entries.append(_ancestry_entry("Galaxy %d" % (galaxy.ordinal + 1), galaxy.id))
+	if system_id != Vector4i.ZERO:
+		var system := simulation.get_star_system_info(system_id)
+		if not system.is_empty():
+			entries.append(_ancestry_entry("System %d" % (system.ordinal + 1), system.id))
+	if planet_id != Vector4i.ZERO:
+		var body := simulation.get_planet_info(planet_id)
+		if not body.is_empty():
+			if body.parent_planet != Vector4i.ZERO:
+				var parent_body := simulation.get_planet_info(body.parent_planet)
+				if not parent_body.is_empty():
+					entries.append(_ancestry_entry("Planet %d" % (parent_body.ordinal + 1), parent_body.id))
+			var body_type := "Moon" if body.parent_planet != Vector4i.ZERO else "Planet"
+			entries.append(_ancestry_entry("%s %d" % [body_type, body.ordinal + 1], body.id))
+	$HUD/Panel/Content/Ancestry.text = "Node ancestry\n" + "\n".join(entries)
+
+func _ancestry_entry(node_name: String, node_id: Vector4i) -> String:
+	return "%s · %s" % [node_name, CosmicSimulation.instance_id_to_string(node_id)]
 
 func _nearest_object() -> Dictionary:
 	if (simulation.get_observer_planet() != Vector4i.ZERO):

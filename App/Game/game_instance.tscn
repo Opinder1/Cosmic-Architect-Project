@@ -58,7 +58,7 @@ script = ExtResource("6")
 [node name="Panel" type="PanelContainer" parent="HUD"]
 offset_left = 20.0
 offset_top = 20.0
-offset_right = 360.0
+offset_right = 440.0
 theme_override_styles/panel = SubResource("PanelStyle")
 
 [node name="Content" type="VBoxContainer" parent="HUD/Panel"]
@@ -68,6 +68,12 @@ theme_override_constants/separation = 10
 [node name="Title" type="Label" parent="HUD/Panel/Content"]
 layout_mode = 2
 text = "Universe exploration"
+
+[node name="Ancestry" type="Label" parent="HUD/Panel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.82, 0.95, 1)
+theme_override_font_sizes/font_size = 12
+text = "Node ancestry"
 
 [node name="Status" type="Label" parent="HUD/Panel/Content"]
 layout_mode = 2
