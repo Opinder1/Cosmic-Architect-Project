@@ -10,6 +10,7 @@ var _network_parent_id := Vector4i.ZERO
 var _pending_arrival := ""
 var _controls_allowed := true
 var _last_pilot := Vector4i.ZERO
+var _last_driver := Vector4i.ZERO
 
 func start_network(address: String, port: int, player_id: Vector4i) -> Error:
 	_networked = true
@@ -25,7 +26,10 @@ func start(path: String) -> Error:
 func _ready() -> void:
 	$DimensionView.simulation = simulation
 	$SpaceShips.simulation = simulation
+	$Vehicles.simulation = simulation
 	simulation.ships_changed.connect(_sync_ship_mode)
+	simulation.vehicles_changed.connect(_sync_vehicle_mode)
+	simulation.vehicle_command_result.connect(_on_vehicle_command_result)
 	simulation.ship_command_result.connect(_on_ship_command_result)
 	if _networked:
 		simulation.world_changed.connect(_on_network_world_changed)
@@ -38,6 +42,7 @@ func _ready() -> void:
 	$HUD/Panel/Content/Explore.pressed.connect(explore_nearest)
 	$HUD/Panel/Content/Leave.pressed.connect(return_to_parent)
 	$HUD/Panel/Content/Ship.pressed.connect(toggle_ship)
+	$HUD/Panel/Content/Vehicle.pressed.connect(toggle_vehicle)
 	$HUD/Panel/Content/ShipLanding.pressed.connect(toggle_ship_landing)
 	_update_status()
 
@@ -61,10 +66,14 @@ func set_controls_active(active: bool) -> void:
 	$Camera.set_controls_active(active and (not _networked or simulation.is_world_ready()))
 	if not active and (simulation.get_piloted_ship() != Vector4i.ZERO):
 		simulation.set_ship_controls(Vector3.ZERO, Vector3.ZERO, false)
+	if not active and simulation.get_driven_vehicle() != Vector4i.ZERO:
+		simulation.set_vehicle_controls(0, 0, true, false)
 	if not active and $PlanetAvatar.active:
 		$PlanetAvatar.walk(0.0, Vector2.ZERO, $Camera.rotation.y, false)
 
 func _observer_pose() -> Transform3D:
+	if simulation.get_driven_vehicle() != Vector4i.ZERO:
+		return simulation.get_vehicle_info(simulation.get_driven_vehicle()).world_transform
 	if (simulation.get_piloted_ship() != Vector4i.ZERO):
 		return simulation.get_space_ship_info(simulation.get_piloted_ship()).world_transform
 	return $PlanetAvatar.transform if $PlanetAvatar.active else $Camera.transform
@@ -77,8 +86,12 @@ func _process(delta: float) -> void:
 		if not simulation.is_world_ready():
 			return
 	_sync_ship_mode()
+	_sync_vehicle_mode()
 	$SpaceShips.refresh()
-	if (simulation.get_piloted_ship() != Vector4i.ZERO):
+	$Vehicles.refresh()
+	if simulation.get_driven_vehicle() != Vector4i.ZERO:
+		$Vehicles.follow_camera($Camera, simulation.get_vehicle_info(simulation.get_driven_vehicle()))
+	elif (simulation.get_piloted_ship() != Vector4i.ZERO):
 		$SpaceShips.follow_camera($Camera, simulation.get_space_ship_info(simulation.get_piloted_ship()))
 	elif $PlanetAvatar.active:
 		$PlanetAvatar.follow_camera($Camera)
@@ -95,7 +108,12 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if simulation.is_initialized() and (not _networked or simulation.is_world_ready()):
-		if (simulation.get_piloted_ship() != Vector4i.ZERO):
+		if simulation.get_driven_vehicle() != Vector4i.ZERO:
+			var direction := Vector2.ZERO
+			if $Camera.controls_active and $Camera.enabled:
+				direction = Input.get_vector("left", "right", "forward", "backward")
+			simulation.set_vehicle_controls(-direction.y, direction.x, Input.is_action_pressed("up") or not $Camera.controls_active, Input.is_action_pressed("speed") and $Camera.controls_active)
+		elif (simulation.get_piloted_ship() != Vector4i.ZERO):
 			var thrust := Vector3.ZERO
 			var turn := Vector3.ZERO
 			if $Camera.controls_active and $Camera.enabled:
@@ -112,7 +130,7 @@ func _physics_process(delta: float) -> void:
 			$PlanetAvatar.walk(delta, direction, $Camera.rotation.y, Input.is_action_pressed("speed"))
 			simulation.set_observer_transform(_observer_pose())
 		if _controls_allowed: simulation.physics_process(delta)
-		if (simulation.get_piloted_ship() != Vector4i.ZERO) and _networked:
+		if (simulation.get_piloted_ship() != Vector4i.ZERO or simulation.get_driven_vehicle() != Vector4i.ZERO) and _networked:
 			simulation.set_observer_transform(_observer_pose())
 
 func _on_network_world_changed() -> void:
@@ -124,7 +142,7 @@ func _on_network_world_changed() -> void:
 		return
 	var parent_id: Vector4i = simulation.get_parent_info().id
 	if parent_id != _network_parent_id:
-		if (simulation.get_piloted_ship() != Vector4i.ZERO):
+		if (simulation.get_piloted_ship() != Vector4i.ZERO or simulation.get_driven_vehicle() != Vector4i.ZERO):
 			_pending_arrival = ""
 		elif _pending_arrival == "galaxy" or _pending_arrival == "star_system":
 			var info := simulation.get_galaxy_info(simulation.get_observer_galaxy()) if _pending_arrival == "galaxy" else simulation.get_star_system_info(simulation.get_observer_star_system())
@@ -154,6 +172,7 @@ func _update_status() -> void:
 	var in_system := (system_id != Vector4i.ZERO)
 	var in_planet := (planet_id != Vector4i.ZERO)
 	var piloting := (simulation.get_piloted_ship() != Vector4i.ZERO)
+	var driving := simulation.get_driven_vehicle() != Vector4i.ZERO
 	var location := "Universe"
 	if in_planet:
 		var body := simulation.get_planet_info(planet_id)
@@ -168,7 +187,9 @@ func _update_status() -> void:
 	$HUD/Panel/Content/Status.text = "%s\nPosition %s\nSpeed %.0f" % [
 		population, _observer_pose().origin, $PlanetAvatar.movement_speed if in_planet else $Camera.speed * $Camera.accelerator]
 	$HUD/Panel/Content/Controls.text = "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — walk · Shift — run\nG — return to system · Escape — pause" if in_planet else "Mouse — look around · X — release / capture\nClick world — capture mouse\nWASD — fly · Space / Ctrl — rise / fall\nQ / E — roll · Shift — accelerate\nEscape — pause / resume"
-	$HUD/Panel/Content/Ship.visible = in_system
+	$HUD/Panel/Content/Ship.visible = in_system and not driving
+	$HUD/Panel/Content/Vehicle.visible = in_system and not piloting
+	$HUD/Panel/Content/Vehicle.text = "Disembark rover (V)" if driving else "Board / deploy rover (V)"
 	$HUD/Panel/Content/ShipLanding.visible = piloting
 	$HUD/Panel/Content/Ship.text = "Disembark (B)" if piloting else "Board / deploy scout (B)"
 	if piloting:
@@ -181,6 +202,14 @@ func _update_status() -> void:
 	$HUD/Panel/Content/Leave.visible = in_planet if piloting else in_galaxy
 	$HUD/Panel/Content/Explore.text = "Explore nearest planet (F)" if in_system else ("Explore nearest system (F)" if in_galaxy else "Explore nearest galaxy (F)")
 	$HUD/Panel/Content/Leave.text = "Return to system (G)" if in_planet else ("Return to galaxy (G)" if in_system else "Return to universe (G)")
+	if driving:
+		var vehicle := simulation.get_vehicle_info(simulation.get_driven_vehicle())
+		$HUD/Panel/Content/Status.text = "%s · %s\nSpeed %.1f · Position %s" % [vehicle.name, "On surface" if vehicle.grounded else "Falling", vehicle.velocity.length(), vehicle.world_transform.origin]
+		$HUD/Panel/Content/Controls.text = "W / S — throttle / reverse · A / D — steer\nSpace — brake · Shift — boost\nMouse — look around · V — disembark when stopped"
+		$HUD/Panel/Content/Target.text = "Driving on " + vehicle.parent_type.replace("_", " ")
+		$HUD/Panel/Content/Explore.visible = false
+		$HUD/Panel/Content/Leave.visible = false
+		return
 	if in_planet:
 		$HUD/Panel/Content/Target.text = "Land within 80 units of the surface, below speed 20" if piloting else "Walking on the planet surface"
 		return
@@ -265,6 +294,11 @@ func _apply_observer() -> void:
 	$Camera.accelerator = 1.0
 	$Camera.far = max($DimensionView.get_render_extent() + $Camera.position.length(), 3500.0 if in_planet else max(extent * 8.0, 100.0))
 	$Camera.space_movement = not in_planet
+	if simulation.get_driven_vehicle() != Vector4i.ZERO:
+		_sync_vehicle_mode()
+		$Vehicles.refresh()
+		$Vehicles.follow_camera($Camera, simulation.get_vehicle_info(simulation.get_driven_vehicle()))
+		return
 	if (simulation.get_piloted_ship() != Vector4i.ZERO):
 		_sync_ship_mode()
 		$SpaceShips.refresh()
@@ -297,6 +331,65 @@ func _on_ship_command_result(action: String, error: int) -> void:
 		$HUD/Panel/Content/Error.show()
 	else:
 		$HUD/Panel/Content/Error.hide()
+
+func _sync_vehicle_mode() -> void:
+	var driver := simulation.get_driven_vehicle()
+	if driver == _last_driver: return
+	_last_driver = driver
+	if driver != Vector4i.ZERO:
+		$PlanetAvatar.leave_planet()
+		$Camera.ship_controls = false
+		$Camera.space_movement = false
+		var pose: Transform3D = simulation.get_vehicle_info(driver).world_transform
+		$Camera.transform = pose
+		$Camera.rotate_object_local(Vector3.RIGHT, -0.25)
+	elif simulation.is_world_ready():
+		$Camera.near = 0.1
+		_apply_observer()
+	_update_status()
+
+func _on_vehicle_command_result(action: String, error: int) -> void:
+	if error != OK:
+		$HUD/Panel/Content/Error.text = "Vehicle " + action + ": " + error_string(error)
+		$HUD/Panel/Content/Error.show()
+	else:
+		$HUD/Panel/Content/Error.hide()
+
+func toggle_vehicle() -> void:
+	if not $Camera.controls_active or not simulation.is_world_ready() or simulation.get_piloted_ship() != Vector4i.ZERO: return
+	simulation.set_observer_transform(_observer_pose())
+	var error: int
+	if simulation.get_driven_vehicle() != Vector4i.ZERO:
+		error = simulation.disembark_vehicle()
+	else:
+		var nearby := Vector4i.ZERO
+		var distance := INF
+		for info in simulation.get_vehicles():
+			var candidate: float = info.world_transform.origin.distance_to(_observer_pose().origin)
+			if candidate <= 24 * info.voxel_size and candidate < distance:
+				nearby = info.id
+				distance = candidate
+		if nearby != Vector4i.ZERO:
+			error = simulation.board_vehicle(nearby)
+		elif simulation.get_observer_planet() != Vector4i.ZERO:
+			error = simulation.deploy_vehicle()
+		else:
+			var host := {}
+			for station in simulation.get_space_stations():
+				var candidate: float = station.transform.origin.distance_to(_observer_pose().origin)
+				if candidate <= station.radius and candidate < distance:
+					host = {"type": "space_station", "id": station.id}
+					distance = candidate
+			for ship in simulation.get_space_ships():
+				var candidate: float = ship.world_transform.origin.distance_to(_observer_pose().origin)
+				if candidate <= 8 * ship.voxel_size and candidate < distance:
+					host = {"type": "space_ship", "id": ship.id}
+					distance = candidate
+			error = simulation.deploy_vehicle(host.type, host.id) if not host.is_empty() else ERR_UNAVAILABLE
+	_on_vehicle_command_result("boarding", error)
+	_sync_vehicle_mode()
+	$Vehicles.refresh()
+	_update_status()
 
 func toggle_ship() -> void:
 	if not $Camera.controls_active or not simulation.is_world_ready(): return
@@ -457,6 +550,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_B:
 			toggle_ship()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_V:
+			toggle_vehicle()
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_L:
 			toggle_ship_landing()
